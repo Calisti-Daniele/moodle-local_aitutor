@@ -14,6 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Run Diagnostic for AI Personal Assistant.
+ *
+ * @package    local_aitutor
+ * @copyright  2026 Daniele Calisti
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 namespace local_aitutor\external;
 
 defined('MOODLE_INTERNAL') || die();
@@ -34,6 +41,11 @@ use local_aitutor\setup\diagnostics;
  * @package local_aitutor
  */
 class run_diagnostics extends external_api {
+    /**
+     * Execute parameters.
+     *
+     * @return external_function_parameters
+     */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'quickcheck' => new external_value(
@@ -51,6 +63,11 @@ class run_diagnostics extends external_api {
         ]);
     }
 
+    /**
+     * Execute returns.
+     *
+     * @return external_single_structure
+     */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'status'         => new external_value(PARAM_TEXT, 'Global status'),
@@ -75,6 +92,14 @@ class run_diagnostics extends external_api {
         ]);
     }
 
+    /**
+     * Execute.
+     *
+     * @param mixed $quickcheck
+     * @param mixed $fix
+     *
+     * @return array
+     */
     public static function execute(
         bool $quickcheck = false,
         string $fix = ''

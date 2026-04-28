@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Ollama Provider for AI Personal Assistant.
+ *
+ * @package    local_aitutor
+ * @copyright  2026 Daniele Calisti
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_aitutor\ai;
 
 defined('MOODLE_INTERNAL') || die();
@@ -30,23 +38,23 @@ defined('MOODLE_INTERNAL') || die();
  * @package local_aitutor
  */
 class ollama_provider implements provider_interface {
-    /** @var string URL base dell'istanza Ollama */
+    /** @var string @var string Modello LLM da usare per la chat */
     private string $baseurl;
-
-    /** @var string Modello LLM da usare per la chat */
+    /** @var string @var string Modello da usare per gli embedding */
     private string $model;
-
-    /** @var string Modello da usare per gli embedding */
+    /** @var string @var int Timeout HTTP in secondi */
     private string $embeddingmodel;
-
-    /** @var int Timeout HTTP in secondi */
+    /** @var int $$timeout */
     private int $timeout;
 
+    /**
+     *   construct.
+     */
     public function __construct() {
         $configurl = get_config('local_aitutor', 'ollama_url');
 
         // Debug temporaneo
-        error_log('AITUTOR ollama_url from config: [' . $configurl . ']');
+        debugging('AITUTOR ollama_url from config: [' . $configurl . ']');
 
         $this->baseurl        = rtrim($configurl ?: 'http://ollama:11434', '/');
         $this->model          = get_config('local_aitutor', 'ollama_model') ?: 'llama3.2';
@@ -54,27 +62,36 @@ class ollama_provider implements provider_interface {
         $this->timeout        = (int)(get_config('local_aitutor', 'request_timeout') ?: 60);
     }
 
-    
-    // CHAT
-    
 
+    // CHAT
+
+
+    /**
+     * Chat.
+     *
+     * @param mixed $messages
+     * @param mixed $systemprompt
+     * @param mixed $options
+     *
+     * @return array
+     */
     public function chat(array $messages, string $systemprompt, array $options = []): array {
 
         $maxtokens   = (int)($options['maxtokens'] ?? 1000);
         $temperature = (float)($options['temperature'] ?? 0.7);
 
         // Costruisce la lista messaggi con il system prompt in testa
-        $payload_messages = [];
+        $payloadmsgs = [];
 
         if (!empty($systemprompt)) {
-            $payload_messages[] = [
+            $payloadmsgs[] = [
                 'role'    => 'system',
                 'content' => $systemprompt,
             ];
         }
 
         foreach ($messages as $msg) {
-            $payload_messages[] = [
+            $payloadmsgs[] = [
                 'role'    => $msg['role'],
                 'content' => $msg['content'],
             ];
@@ -82,7 +99,7 @@ class ollama_provider implements provider_interface {
 
         $payload = [
             'model'    => $this->model,
-            'messages' => $payload_messages,
+            'messages' => $payloadmsgs,
             'stream'   => false, // Risposta completa, non streaming
             'options'  => [
                 'num_predict' => $maxtokens,
@@ -100,10 +117,17 @@ class ollama_provider implements provider_interface {
         ];
     }
 
-    
-    // EMBEDDING
-    
 
+    // EMBEDDING
+
+
+    /**
+     * Embed.
+     *
+     * @param mixed $text
+     *
+     * @return array
+     */
     public function embed(string $text): array {
 
         $payload = [
@@ -129,10 +153,15 @@ class ollama_provider implements provider_interface {
         return $embeddings;
     }
 
-    
-    // TEST CONNESSIONE
-    
 
+    // TEST CONNESSIONE
+
+
+    /**
+     * Test connection.
+     *
+     * @return array
+     */
     public function test_connection(): array {
         try {
             $ch = curl_init($this->baseurl . '/api/tags');
@@ -185,10 +214,15 @@ class ollama_provider implements provider_interface {
         }
     }
 
-    
-    // MODELLI DISPONIBILI
-    
 
+    // MODELLI DISPONIBILI
+
+
+    /**
+     * Get available models.
+     *
+     * @return array
+     */
     public function get_available_models(): array {
         return [
             // Llama 3.x — Meta
@@ -218,6 +252,11 @@ class ollama_provider implements provider_interface {
         ];
     }
 
+    /**
+     * Get embedding models.
+     *
+     * @return array
+     */
     public function get_embedding_models(): array {
         return [
             'nomic-embed-text'  => 'Nomic Embed Text — ' . get_string('embed_nomic_desc', 'local_aitutor'),
@@ -226,24 +265,39 @@ class ollama_provider implements provider_interface {
         ];
     }
 
-    
-    // INFO PROVIDER
-    
 
+    // INFO PROVIDER
+
+
+    /**
+     * Get name.
+     *
+     * @return string
+     */
     public function get_name(): string {
         return 'Ollama (self-hosted)';
     }
 
+    /**
+     * Get description.
+     *
+     * @return string
+     */
     public function get_description(): string {
         return get_string('ollama_description', 'local_aitutor');
     }
 
-    
+
     // HTTP HELPERS PRIVATI
-    
+
 
     /**
-     * Esegue una POST verso l'API Ollama.
+     * Http post.
+     *
+     * @param mixed $endpoint
+     * @param mixed $payload
+     *
+     * @return array
      */
     private function http_post(string $endpoint, array $payload): array {
         $url  = $this->baseurl . $endpoint;
@@ -251,15 +305,15 @@ class ollama_provider implements provider_interface {
 
         $ch = curl_init($url);
         curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POST           => true,
-            CURLOPT_POSTFIELDS     => $json,
-            CURLOPT_TIMEOUT        => $this->timeout,
-            CURLOPT_CONNECTTIMEOUT => 10,
-            CURLOPT_HTTPHEADER     => [
-                'Content-Type: application/json',
-                'Content-Length: ' . strlen($json),
-            ],
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => $json,
+        CURLOPT_TIMEOUT        => $this->timeout,
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_HTTPHEADER     => [
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen($json),
+        ],
         ]);
 
         $response = curl_exec($ch);
@@ -272,16 +326,20 @@ class ollama_provider implements provider_interface {
     }
 
     /**
-     * Esegue una GET verso l'API Ollama.
+     * Http get.
+     *
+     * @param mixed $endpoint
+     *
+     * @return array
      */
     private function http_get(string $endpoint): array {
         $url = $this->baseurl . $endpoint;
 
         $ch = curl_init($url);
         curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT        => 15,
-            CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT        => 15,
+        CURLOPT_CONNECTTIMEOUT => 10,
         ]);
 
         $response = curl_exec($ch);
@@ -294,7 +352,14 @@ class ollama_provider implements provider_interface {
     }
 
     /**
-     * Parsa la risposta HTTP grezza.
+     * Parse response raw.
+     *
+     * @param mixed $response
+     * @param mixed $httpcode
+     * @param mixed $error
+     * @param mixed $errno
+     *
+     * @return array
      */
     private function parse_response_raw(
         string|bool $response,

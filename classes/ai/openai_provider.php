@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * OpenAI Provider for AI Personal Assistant.
+ *
+ * @package    local_aitutor
+ * @copyright  2026 Daniele Calisti
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_aitutor\ai;
 
 defined('MOODLE_INTERNAL') || die();
@@ -31,13 +39,24 @@ defined('MOODLE_INTERNAL') || die();
  * @package local_aitutor
  */
 class openai_provider implements provider_interface {
+    /** @var string $$apikey */
     private string $apikey;
+    /** @var string $$model */
     private string $model;
+    /** @var string $$embeddingmodel */
     private string $embeddingmodel;
+    /** @var int $$timeout */
     private int $timeout;
 
+    /**
+     * Summary of API_BASE
+     * @var string
+     */
     private const API_BASE = 'https://api.openai.com/v1';
 
+    /**
+     *   construct.
+     */
     public function __construct() {
         $this->apikey         = get_config('aitutor', 'openai_apikey') ?: '';
         $this->model          = get_config('aitutor', 'openai_model') ?: 'gpt-4o-mini';
@@ -45,27 +64,36 @@ class openai_provider implements provider_interface {
         $this->timeout        = (int)(get_config('aitutor', 'request_timeout') ?: 60);
     }
 
-    
-    // CHAT
-    
 
+    // CHAT
+
+
+    /**
+     * Chat.
+     *
+     * @param mixed $messages
+     * @param mixed $systemprompt
+     * @param mixed $options
+     *
+     * @return array
+     */
     public function chat(array $messages, string $systemprompt, array $options = []): array {
 
         $this->validate_apikey();
 
-        $payload_messages = [];
+        $payloadmsgs = [];
 
         if (!empty($systemprompt)) {
-            $payload_messages[] = ['role' => 'system', 'content' => $systemprompt];
+            $payloadmsgs[] = ['role' => 'system', 'content' => $systemprompt];
         }
 
         foreach ($messages as $msg) {
-            $payload_messages[] = ['role' => $msg['role'], 'content' => $msg['content']];
+            $payloadmsgs[] = ['role' => $msg['role'], 'content' => $msg['content']];
         }
 
         $payload = [
             'model'       => $this->model,
-            'messages'    => $payload_messages,
+            'messages'    => $payloadmsgs,
             'max_tokens'  => (int)($options['maxtokens'] ?? 1000),
             'temperature' => (float)($options['temperature'] ?? 0.7),
         ];
@@ -80,10 +108,17 @@ class openai_provider implements provider_interface {
         ];
     }
 
-    
-    // EMBEDDING
-    
 
+    // EMBEDDING
+
+
+    /**
+     * Embed.
+     *
+     * @param mixed $text
+     *
+     * @return array
+     */
     public function embed(string $text): array {
 
         $this->validate_apikey();
@@ -94,10 +129,15 @@ class openai_provider implements provider_interface {
         return $response['data'][0]['embedding'] ?? [];
     }
 
-    
-    // TEST CONNESSIONE
-    
 
+    // TEST CONNESSIONE
+
+
+    /**
+     * Test connection.
+     *
+     * @return array
+     */
     public function test_connection(): array {
         try {
             $this->validate_apikey();
@@ -125,10 +165,15 @@ class openai_provider implements provider_interface {
         }
     }
 
-    
-    // MODELLI DISPONIBILI
-    
 
+    // MODELLI DISPONIBILI
+
+
+    /**
+     * Get available models.
+     *
+     * @return array
+     */
     public function get_available_models(): array {
         return [
             // GPT-4o family
@@ -147,6 +192,11 @@ class openai_provider implements provider_interface {
         ];
     }
 
+    /**
+     * Get embedding models.
+     *
+     * @return array
+     */
     public function get_embedding_models(): array {
         return [
             'text-embedding-3-small' => 'text-embedding-3-small — ' . get_string('embed_openai_small_desc', 'aitutor'),
@@ -155,18 +205,36 @@ class openai_provider implements provider_interface {
         ];
     }
 
+    /**
+     * Get name.
+     *
+     * @return string
+     */
     public function get_name(): string {
         return 'OpenAI';
     }
 
+    /**
+     * Get description.
+     *
+     * @return string
+     */
     public function get_description(): string {
         return get_string('openai_description', 'aitutor');
     }
 
-    
-    // HTTP HELPERS
-    
 
+    // HTTP HELPERS
+
+
+    /**
+     * Http post.
+     *
+     * @param mixed $endpoint
+     * @param mixed $payload
+     *
+     * @return array
+     */
     private function http_post(string $endpoint, array $payload): array {
         $curl = new \curl();
         $curl->setopt(['CURLOPT_TIMEOUT' => $this->timeout]);
@@ -183,6 +251,13 @@ class openai_provider implements provider_interface {
         return $this->parse_response($response, $curl);
     }
 
+    /**
+     * Http get.
+     *
+     * @param mixed $endpoint
+     *
+     * @return array
+     */
     private function http_get(string $endpoint): array {
         $curl = new \curl();
         $curl->setopt([
@@ -195,12 +270,23 @@ class openai_provider implements provider_interface {
         return $this->parse_response($response, $curl);
     }
 
+    /**
+     * Validate apikey.
+     */
     private function validate_apikey(): void {
         if (empty($this->apikey)) {
             throw new \moodle_exception('error_apikey', 'aitutor');
         }
     }
 
+    /**
+     * Parse response.
+     *
+     * @param mixed $response
+     * @param mixed $curl
+     *
+     * @return array
+     */
     private function parse_response(string $response, \curl $curl): array {
         if ($curl->get_errno()) {
             throw new \moodle_exception(

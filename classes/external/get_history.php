@@ -14,6 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Get History for AI Personal Assistant.
+ *
+ * @package    local_aitutor
+ * @copyright  2026 Daniele Calisti
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 namespace local_aitutor\external;
 
 defined('MOODLE_INTERNAL') || die();
@@ -34,6 +41,11 @@ use external_value;
  * @package local_aitutor
  */
 class get_history extends external_api {
+    /**
+     * Execute parameters.
+     *
+     * @return external_function_parameters
+     */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'sessionid' => new external_value(
@@ -50,6 +62,11 @@ class get_history extends external_api {
         ]);
     }
 
+    /**
+     * Execute returns.
+     *
+     * @return external_single_structure
+     */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'success'  => new external_value(PARAM_BOOL, 'Success'),
@@ -66,6 +83,14 @@ class get_history extends external_api {
         ]);
     }
 
+    /**
+     * Execute.
+     *
+     * @param mixed $sessionid
+     * @param mixed $limit
+     *
+     * @return array
+     */
     public static function execute(int $sessionid, int $limit = 30): array {
         global $USER, $DB;
 

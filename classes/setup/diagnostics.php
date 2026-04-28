@@ -19,6 +19,8 @@ namespace local_aitutor\setup;
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Standalone diagnostics page for AI Personal Assistant.
+ *
  * @package    local_aitutor
  * @copyright  2026 Daniele Calisti
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -45,19 +47,25 @@ class diagnostics {
     /** @var string Provider configurato */
     private string $provider;
 
-    // Stati possibili per ogni check
+    /** @var string Stati possibili per ogni check */
     const STATUS_OK      = 'ok';
+    /** @var string Stati possibili per ogni check */
     const STATUS_WARNING = 'warning';
+    /** @var string Stati possibili per ogni check */
     const STATUS_ERROR   = 'error';
+    /** @var string Stati possibili per ogni check */
     const STATUS_INFO    = 'info';
 
+    /**
+     *   construct.
+     */
     public function __construct() {
         $this->provider = get_config('local_aitutor', 'provider') ?: 'ollama';
     }
 
-    
+
     // ENTRY POINT — Esegui tutti i check
-    
+
 
     /**
      * Esegue tutti i check e restituisce il report completo.
@@ -101,10 +109,13 @@ class diagnostics {
         ];
     }
 
-    
-    // CHECK 1 — Versione PHP
-    
 
+    // CHECK 1 — Versione PHP
+
+
+    /**
+     * Check php version.
+     */
     private function check_php_version(): void {
         $required = '8.1.0';
         $current  = PHP_VERSION;
@@ -115,16 +126,16 @@ class diagnostics {
             get_string('diag_php_version', 'local_aitutor'),
             $ok ? self::STATUS_OK : self::STATUS_ERROR,
             $ok
-                ? get_string(
-                    'diag_php_version_ok',
-                    'local_aitutor',
-                    (object)['version' => $current]
-                )
-                : get_string(
-                    'diag_php_version_error',
-                    'local_aitutor',
-                    (object)['current' => $current, 'required' => $required]
-                ),
+            ? get_string(
+                'diag_php_version_ok',
+                'local_aitutor',
+                (object)['version' => $current]
+            )
+            : get_string(
+                'diag_php_version_error',
+                'local_aitutor',
+                (object)['current' => $current, 'required' => $required]
+            ),
             $ok ? null : get_string(
                 'diag_php_version_fix',
                 'local_aitutor',
@@ -133,10 +144,13 @@ class diagnostics {
         );
     }
 
-    
-    // CHECK 2 — Estensioni PHP
-    
 
+    // CHECK 2 — Estensioni PHP
+
+
+    /**
+     * Check php extensions.
+     */
     private function check_php_extensions(): void {
         $required = ['curl', 'json', 'mbstring', 'openssl'];
         $missing  = array_filter($required, fn($ext) => !extension_loaded($ext));
@@ -167,10 +181,13 @@ class diagnostics {
         }
     }
 
-    
-    // CHECK 3 — Plugin abilitato
-    
 
+    // CHECK 3 — Plugin abilitato
+
+
+    /**
+     * Check plugin enabled.
+     */
     private function check_plugin_enabled(): void {
         $enabled = (bool)get_config('local_aitutor', 'enabled');
 
@@ -179,17 +196,20 @@ class diagnostics {
             get_string('diag_plugin_enabled', 'local_aitutor'),
             $enabled ? self::STATUS_OK : self::STATUS_WARNING,
             $enabled
-                ? get_string('diag_plugin_enabled_ok', 'local_aitutor')
-                : get_string('diag_plugin_enabled_warning', 'local_aitutor'),
+            ? get_string('diag_plugin_enabled_ok', 'local_aitutor')
+            : get_string('diag_plugin_enabled_warning', 'local_aitutor'),
             $enabled ? null
-                : get_string('diag_plugin_enabled_fix', 'local_aitutor')
+            : get_string('diag_plugin_enabled_fix', 'local_aitutor')
         );
     }
 
-    
-    // CHECK 4 — Capabilities
-    
 
+    // CHECK 4 — Capabilities
+
+
+    /**
+     * Check capabilities.
+     */
     private function check_capabilities(): void {
         global $DB;
 
@@ -244,18 +264,21 @@ class diagnostics {
         }
     }
 
-    
-    // CHECK 5 — Servizi web registrati
-    
 
+    // CHECK 5 — Servizi web registrati
+
+
+    /**
+     * Check services registered.
+     */
     private function check_services_registered(): void {
         global $DB;
 
         $expected = [
-            'local_aitutor_send_message',
-            'local_aitutor_clear_session',
-            'local_aitutor_get_history',
-            'local_aitutor_test_connection',
+        'local_aitutor_send_message',
+        'local_aitutor_clear_session',
+        'local_aitutor_get_history',
+        'local_aitutor_test_connection',
         ];
 
         $found   = [];
@@ -295,10 +318,13 @@ class diagnostics {
         }
     }
 
-    
-    // CHECK 6 — Provider configurato
-    
 
+    // CHECK 6 — Provider configurato
+
+
+    /**
+     * Check provider configured.
+     */
     private function check_provider_configured(): void {
         $provider = $this->provider;
         $issues   = [];
@@ -356,10 +382,13 @@ class diagnostics {
         }
     }
 
-    
-    // CHECK 7 — Connessione al provider
-    
 
+    // CHECK 7 — Connessione al provider
+
+
+    /**
+     * Check provider connection.
+     */
     private function check_provider_connection(): void {
         try {
             $factory  = new \local_aitutor\ai\provider_factory();
@@ -401,13 +430,16 @@ class diagnostics {
         }
     }
 
-    
-    // CHECK 8 — Moodle HTTP Security (solo Ollama)
-    
 
+    // CHECK 8 — Moodle HTTP Security (solo Ollama)
+
+
+    /**
+     * Check moodle http security.
+     */
     private function check_moodle_http_security(): void {
         $ollamaurl = get_config('local_aitutor', 'ollama_url')
-                    ?: 'http://ollama:11434';
+                ?: 'http://ollama:11434';
         $parsed    = parse_url($ollamaurl);
         $host      = $parsed['host'] ?? 'localhost';
         $port      = $parsed['port'] ?? 11434;
@@ -415,9 +447,9 @@ class diagnostics {
         // Test con curl nativo — bypassa il security check
         $ch = curl_init($ollamaurl . '/api/tags');
         curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT        => 5,
-            CURLOPT_CONNECTTIMEOUT => 3,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT        => 5,
+        CURLOPT_CONNECTTIMEOUT => 3,
         ]);
         curl_exec($ch);
         $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -475,9 +507,9 @@ class diagnostics {
         }
     }
 
-    
+
     // FIX AUTOMATICI
-    
+
 
     /**
      * Tenta di risolvere automaticamente il problema HTTP security.
@@ -590,12 +622,19 @@ class diagnostics {
         }
     }
 
-    
+
     // HELPERS
-    
+
 
     /**
-     * Aggiunge un risultato alla lista check.
+     * Add result.
+     *
+     * @param mixed $key
+     * @param mixed $label
+     * @param mixed $status
+     * @param mixed $message
+     * @param mixed $fix
+     * @param mixed $actions
      */
     private function add_result(
         string $key,
@@ -606,18 +645,22 @@ class diagnostics {
         array $actions = []
     ): void {
         $this->results[$key] = [
-            'key'     => $key,
-            'label'   => $label,
-            'status'  => $status,
-            'message' => $message,
-            'fix'     => $fix,
-            'actions' => $actions,
-            'icon'    => $this->status_icon($status),
+        'key'     => $key,
+        'label'   => $label,
+        'status'  => $status,
+        'message' => $message,
+        'fix'     => $fix,
+        'actions' => $actions,
+        'icon'    => $this->status_icon($status),
         ];
     }
 
     /**
-     * Restituisce un'icona per ogni stato.
+     * Status icon.
+     *
+     * @param mixed $status
+     *
+     * @return string
      */
     private function status_icon(string $status): string {
         return match ($status) {
@@ -630,7 +673,9 @@ class diagnostics {
     }
 
     /**
-     * Calcola lo stato globale in base ai risultati.
+     * Calculate global status.
+     *
+     * @return string
      */
     private function calculate_global_status(): string {
         $statuses = array_column($this->results, 'status');
@@ -647,7 +692,11 @@ class diagnostics {
     }
 
     /**
-     * Conta i check per stato.
+     * Count by status.
+     *
+     * @param mixed $status
+     *
+     * @return int
      */
     private function count_by_status(string $status): int {
         return count(array_filter(
@@ -657,7 +706,11 @@ class diagnostics {
     }
 
     /**
-     * Costruisce il messaggio di riepilogo.
+     * Build summary.
+     *
+     * @param mixed $globalstatus
+     *
+     * @return string
      */
     private function build_summary(string $globalstatus): string {
         return match ($globalstatus) {
@@ -680,7 +733,11 @@ class diagnostics {
     }
 
     /**
-     * Suggerisce il fix corretto in base al messaggio di errore.
+     * Get connection fix.
+     *
+     * @param mixed $errormessage
+     *
+     * @return string
      */
     private function get_connection_fix(string $errormessage): string {
         $msg = strtolower($errormessage);

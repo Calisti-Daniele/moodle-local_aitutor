@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Anthropic Provider for AI Personal Assistant.
+ *
+ * @package    local_aitutor
+ * @copyright  2026 Daniele Calisti
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_aitutor\ai;
 
 defined('MOODLE_INTERNAL') || die();
@@ -32,37 +40,59 @@ defined('MOODLE_INTERNAL') || die();
  * @package local_aitutor
  */
 class anthropic_provider implements provider_interface {
+    /** @var string $$apikey */
     private string $apikey;
+    /** @var string $$model */
     private string $model;
+    /** @var int $$timeout */
     private int $timeout;
 
+    /**
+     * @var string
+     */
     private const API_BASE    = 'https://api.anthropic.com/v1';
+
+    /**
+     * @var string
+     */
     private const API_VERSION = '2023-06-01';
 
+    /**
+     *   construct.
+     */
     public function __construct() {
         $this->apikey   = get_config('aitutor', 'anthropic_apikey') ?: '';
         $this->model    = get_config('aitutor', 'anthropic_model') ?: 'claude-3-5-haiku-latest';
         $this->timeout  = (int)(get_config('aitutor', 'request_timeout') ?: 60);
     }
 
-    
-    // CHAT
-    
 
+    // CHAT
+
+
+    /**
+     * Chat.
+     *
+     * @param mixed $messages
+     * @param mixed $systemprompt
+     * @param mixed $options
+     *
+     * @return array
+     */
     public function chat(array $messages, string $systemprompt, array $options = []): array {
 
         $this->validate_apikey();
 
         // Anthropic vuole i messaggi senza il ruolo 'system'
         // Il system prompt va in un campo separato
-        $payload_messages = array_map(fn($m) => [
+        $payloadmsgs = array_map(fn($m) => [
             'role'    => $m['role'],
             'content' => $m['content'],
         ], $messages);
 
         // Anthropic richiede che il primo messaggio sia sempre 'user'
-        if (empty($payload_messages) || $payload_messages[0]['role'] !== 'user') {
-            array_unshift($payload_messages, [
+        if (empty($payloadmsgs) || $payloadmsgs[0]['role'] !== 'user') {
+            array_unshift($payloadmsgs, [
                 'role'    => 'user',
                 'content' => 'Hello',
             ]);
@@ -71,7 +101,7 @@ class anthropic_provider implements provider_interface {
         $payload = [
             'model'      => $this->model,
             'max_tokens' => (int)($options['maxtokens'] ?? 1000),
-            'messages'   => $payload_messages,
+            'messages'   => $payloadmsgs,
         ];
 
         // Temperature non supportata da tutti i modelli Anthropic
@@ -94,12 +124,19 @@ class anthropic_provider implements provider_interface {
         ];
     }
 
-    
+
     // EMBEDDING
     // Anthropic non ha un endpoint embedding nativo.
     // Usiamo un fallback su OpenAI o lanciamo eccezione.
-    
 
+
+    /**
+     * Embed.
+     *
+     * @param mixed $text
+     *
+     * @return array
+     */
     public function embed(string $text): array {
         throw new \moodle_exception(
             'error_unavailable',
@@ -111,10 +148,15 @@ class anthropic_provider implements provider_interface {
         );
     }
 
-    
-    // TEST CONNESSIONE
-    
 
+    // TEST CONNESSIONE
+
+
+    /**
+     * Test connection.
+     *
+     * @return array
+     */
     public function test_connection(): array {
         try {
             $this->validate_apikey();
@@ -141,10 +183,15 @@ class anthropic_provider implements provider_interface {
         }
     }
 
-    
-    // MODELLI DISPONIBILI
-    
 
+    // MODELLI DISPONIBILI
+
+
+    /**
+     * Get available models.
+     *
+     * @return array
+     */
     public function get_available_models(): array {
         return [
             // Claude 3.5 family
@@ -158,23 +205,46 @@ class anthropic_provider implements provider_interface {
         ];
     }
 
+    /**
+     * Get embedding models.
+     *
+     * @return array
+     */
     public function get_embedding_models(): array {
         // Anthropic non supporta embedding nativi
         return [];
     }
 
+    /**
+     * Get name.
+     *
+     * @return string
+     */
     public function get_name(): string {
         return 'Anthropic (Claude)';
     }
 
+    /**
+     * Get description.
+     *
+     * @return string
+     */
     public function get_description(): string {
         return get_string('anthropic_description', 'aitutor');
     }
 
-    
-    // HTTP HELPERS
-    
 
+    // HTTP HELPERS
+
+
+    /**
+     * Http post.
+     *
+     * @param mixed $endpoint
+     * @param mixed $payload
+     *
+     * @return array
+     */
     private function http_post(string $endpoint, array $payload): array {
         $curl = new \curl();
         $curl->setopt(['CURLOPT_TIMEOUT' => $this->timeout]);
@@ -192,12 +262,23 @@ class anthropic_provider implements provider_interface {
         return $this->parse_response($response, $curl);
     }
 
+    /**
+     * Validate apikey.
+     */
     private function validate_apikey(): void {
         if (empty($this->apikey)) {
             throw new \moodle_exception('error_apikey', 'aitutor');
         }
     }
 
+    /**
+     * Parse response.
+     *
+     * @param mixed $response
+     * @param mixed $curl
+     *
+     * @return array
+     */
     private function parse_response(string $response, \curl $curl): array {
         if ($curl->get_errno()) {
             throw new \moodle_exception(

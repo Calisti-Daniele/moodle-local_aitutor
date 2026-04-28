@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Setting test Connection for AI Personal Assistant.
+ *
+ * @package    local_aitutor
+ * @copyright  2026 Daniele Calisti
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_aitutor\admin;
 
 defined('MOODLE_INTERNAL') || die();
@@ -26,23 +34,41 @@ defined('MOODLE_INTERNAL') || die();
  * @package local_aitutor
  */
 class setting_test_connection extends \admin_setting {
+    /**
+     *   construct.
+     *
+     * @param mixed $name
+     * @param mixed $visiblename
+     * @param mixed $description
+     */
     public function __construct(string $name, string $visiblename, string $description) {
         parent::__construct($name, $visiblename, $description, '');
     }
 
     /**
-     * Questo setting non salva nulla — è solo un bottone.
+     * Get setting.
+     *
+     * @return bool
      */
     public function get_setting(): bool {
         return true;
     }
 
+    /**
+     * Write setting.
+     *
+     * @param mixed $data
+     *
+     * @return string
+     */
     public function write_setting($data): string {
         return '';
     }
 
     /**
-     * Renderizza il bottone e il contenitore risultati.
+     * Output html.
+     *
+     * @return string
      */
     public function output_html($data, $query = ''): string {
         global $PAGE, $OUTPUT;
@@ -60,9 +86,9 @@ class setting_test_connection extends \admin_setting {
             'button',
             get_string('settings_test_connection', 'local_aitutor'),
             [
-                'type'  => 'button',
-                'class' => 'btn btn-secondary',
-                'id'    => 'aitutor-test-btn',
+            'type'  => 'button',
+            'class' => 'btn btn-secondary',
+            'id'    => 'aitutor-test-btn',
             ]
         );
 

@@ -5,17 +5,24 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-
-defined('MOODLE_INTERNAL') || die();
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Hook callbacks per local_aitutor.
+ * Hook callbacks for AI Personal Assistant.
  *
- * Moodle 4.3+ usa il nuovo sistema di hooks basato su classi PHP.
- * Qui registriamo il listener che inietta il widget in ogni pagina.
- *
- * @see https://moodledev.io/docs/4.3/apis/core/hooks
+ * @package    local_aitutor
+ * @copyright  2026 Daniele Calisti
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 $callbacks = [
     [

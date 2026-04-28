@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Context Builder for AI Personal Assistant.
+ *
+ * @package    local_aitutor
+ * @copyright  2026 Daniele Calisti
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_aitutor\ai;
 
 defined('MOODLE_INTERNAL') || die();
@@ -35,26 +43,27 @@ defined('MOODLE_INTERNAL') || die();
 class context_builder {
     /** @var \stdClass Utente corrente */
     private \stdClass $user;
-
     /** @var int Massimo caratteri totali per il contesto */
     private const MAX_CONTEXT_CHARS = 12000;
-
     /** @var int Numero massimo di corsi da includere nel contesto */
     private const MAX_COURSES = 10;
-
     /** @var int Numero massimo di scadenze da includere */
     private const MAX_DEADLINES = 10;
-
     /** @var int Numero massimo di voti recenti per corso */
     private const MAX_GRADES_PER_COURSE = 3;
 
+    /**
+     *   construct.
+     *
+     * @param mixed $user
+     */
     public function __construct(\stdClass $user) {
         $this->user = $user;
     }
 
-    
+
     // ENTRY POINT PRINCIPALE
-    
+
 
     /**
      * Costruisce il system prompt completo per l'AI.
@@ -100,10 +109,15 @@ class context_builder {
         return $prompt;
     }
 
-    
-    // BLOCCO 1 — Identità assistente
-    
 
+    // BLOCCO 1 — Identità assistente
+
+
+    /**
+     * Build identity block.
+     *
+     * @return string
+     */
     private function build_identity_block(): string {
         $sitename = format_string(get_site()->fullname);
         $date     = userdate(time(), get_string('strftimedate', 'langconfig'));
@@ -123,10 +137,15 @@ class context_builder {
         PROMPT;
     }
 
-    
-    // BLOCCO 2 — Profilo utente
-    
 
+    // BLOCCO 2 — Profilo utente
+
+
+    /**
+     * Build user profile block.
+     *
+     * @return string
+     */
     private function build_user_profile_block(): string {
         $fullname  = fullname($this->user);
         $firstname = $this->user->firstname;
@@ -151,10 +170,15 @@ class context_builder {
         PROMPT;
     }
 
-    
-    // BLOCCO 3 — Corsi iscritti + progressi
-    
 
+    // BLOCCO 3 — Corsi iscritti + progressi
+
+
+    /**
+     * Build courses block.
+     *
+     * @return string
+     */
     private function build_courses_block(): string {
         $courses = $this->get_enrolled_courses();
 
@@ -186,10 +210,15 @@ class context_builder {
         return $block;
     }
 
-    
-    // BLOCCO 4 — Voti e feedback
-    
 
+    // BLOCCO 4 — Voti e feedback
+
+
+    /**
+     * Build grades block.
+     *
+     * @return string
+     */
     private function build_grades_block(): string {
         $courses = $this->get_enrolled_courses();
 
@@ -233,10 +262,15 @@ class context_builder {
         return $block;
     }
 
-    
-    // BLOCCO 5 — Scadenze imminenti
-    
 
+    // BLOCCO 5 — Scadenze imminenti
+
+
+    /**
+     * Build deadlines block.
+     *
+     * @return string
+     */
     private function build_deadlines_block(): string {
         $deadlines = $this->get_upcoming_deadlines();
 
@@ -263,10 +297,15 @@ class context_builder {
         return $block;
     }
 
-    
-    // BLOCCO 6 — Certificati
-    
 
+    // BLOCCO 6 — Certificati
+
+
+    /**
+     * Build certificates block.
+     *
+     * @return string
+     */
     private function build_certificates_block(): string {
         $certificates = $this->get_certificates();
 
@@ -287,10 +326,15 @@ class context_builder {
         return $block;
     }
 
-    
-    // BLOCCO 7 — Regole comportamentali
-    
 
+    // BLOCCO 7 — Regole comportamentali
+
+
+    /**
+     * Build behaviour block.
+     *
+     * @return string
+     */
     private function build_behaviour_block(): string {
         return <<<PROMPT
         # BEHAVIOUR RULES
@@ -305,9 +349,9 @@ class context_builder {
         PROMPT;
     }
 
-    
+
     // DATA FETCHERS — Recupero dati da Moodle
-    
+
 
     /**
      * Recupera tutti i corsi a cui è iscritto l'utente.
@@ -679,12 +723,17 @@ class context_builder {
         return $certificates;
     }
 
-    
+
     // UTILITY
-    
+
 
     /**
-     * Tronca un testo a una lunghezza massima rispettando le parole.
+     * Truncate.
+     *
+     * @param mixed $text
+     * @param mixed $maxlength
+     *
+     * @return string
      */
     private function truncate(string $text, int $maxlength): string {
         $text = trim(strip_tags($text));
@@ -697,12 +746,16 @@ class context_builder {
         $lastspace = mb_strrpos($truncated, ' ');
 
         return ($lastspace !== false
-            ? mb_substr($truncated, 0, $lastspace)
-            : $truncated) . '…';
+        ? mb_substr($truncated, 0, $lastspace)
+        : $truncated) . '…';
     }
 
     /**
-     * Restituisce una stringa leggibile dei giorni mancanti a una scadenza.
+     * Days until.
+     *
+     * @param mixed $timestamp
+     *
+     * @return string
      */
     private function days_until(int $timestamp): string {
         $diff = $timestamp - time();

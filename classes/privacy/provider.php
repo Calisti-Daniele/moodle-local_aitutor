@@ -14,15 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-namespace local_aitutor\privacy;
-
-defined('MOODLE_INTERNAL') || die();
-
 /**
+ *  Provider Privacy for AI Personal Assistant.
+ *
  * @package    local_aitutor
  * @copyright  2026 Daniele Calisti
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace local_aitutor\privacy;
+
+defined('MOODLE_INTERNAL') || die();
+
 
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
@@ -47,18 +49,9 @@ use core_privacy\local\request\writer;
  * @package local_aitutor
  */
 class provider implements
-    // Dichiara quali dati personali tratta il plugin
     \core_privacy\local\metadata\provider,
-
-    // Permette export dei dati utente
-    \core_privacy\local\request\plugin\provider,
-
-    // Permette operazioni su liste di utenti (per admin)
-    \core_privacy\local\request\core_userlist_provider {
-    
-    // METADATA — Dichiara i dati trattati
-    
-
+    \core_privacy\local\request\core_userlist_provider,
+    \core_privacy\local\request\plugin\provider {
     /**
      * Restituisce la lista dei dati personali trattati dal plugin.
      * Moodle usa questo per generare la privacy policy.
@@ -106,9 +99,9 @@ class provider implements
         return $collection;
     }
 
-    
+
     // CONTEXTLIST — Trova i contesti con dati dell'utente
-    
+
 
     /**
      * Restituisce i contesti che contengono dati dell'utente.
@@ -137,9 +130,9 @@ class provider implements
         return $contextlist;
     }
 
-    
+
     // USERLIST — Lista utenti con dati in un contesto
-    
+
 
     /**
      * Aggiunge gli utenti che hanno dati nel contesto dato.
@@ -157,9 +150,9 @@ class provider implements
         $userlist->add_from_sql('userid', $sql, []);
     }
 
-    
+
     // EXPORT — Esporta i dati dell'utente
-    
+
 
     /**
      * Esporta tutti i dati personali dell'utente.
@@ -231,9 +224,9 @@ class provider implements
         }
     }
 
-    
+
     // DELETE — Cancella i dati dell'utente
-    
+
 
     /**
      * Cancella tutti i dati in un contesto.
@@ -319,9 +312,9 @@ class provider implements
         }
     }
 
-    
+
     // HELPER PRIVATI
-    
+
 
     /**
      * Cancella tutti i dati AI di un utente specifico.

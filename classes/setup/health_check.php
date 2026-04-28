@@ -19,6 +19,8 @@ namespace local_aitutor\setup;
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Quick health check for AI Personal Assistant.
+ *
  * @package    local_aitutor
  * @copyright  2026 Daniele Calisti
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -31,7 +33,9 @@ defined('MOODLE_INTERNAL') || die();
  */
 class health_check {
     /**
-     * Restituisce true se il plugin è completamente configurato.
+     * Is ready.
+     *
+     * @return bool
      */
     public static function is_ready(): bool {
         $diag   = new diagnostics();
@@ -40,7 +44,9 @@ class health_check {
     }
 
     /**
-     * Restituisce il numero di errori critici.
+     * Error count.
+     *
+     * @return int
      */
     public static function error_count(): int {
         $diag   = new diagnostics();

@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Send Message for AI Personal Assistant.
+ *
+ * @package    local_aitutor
+ * @copyright  2026 Daniele Calisti
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_aitutor\external;
 
 defined('MOODLE_INTERNAL') || die();
@@ -41,49 +49,52 @@ use local_aitutor\ai\provider_factory;
  * @package local_aitutor
  */
 class send_message extends external_api {
-    
     // PARAMETRI INPUT
-    
+
 
     /**
-     * Definisce i parametri accettati dalla funzione.
+     * Execute parameters.
+     *
+     * @return external_function_parameters
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'sessionid' => new external_value(
-                PARAM_INT,
-                'Session ID',
-                VALUE_REQUIRED
-            ),
-            'message' => new external_value(
-                PARAM_TEXT,
-                'User message',
-                VALUE_REQUIRED
-            ),
+        'sessionid' => new external_value(
+            PARAM_INT,
+            'Session ID',
+            VALUE_REQUIRED
+        ),
+        'message' => new external_value(
+            PARAM_TEXT,
+            'User message',
+            VALUE_REQUIRED
+        ),
         ]);
     }
 
-    
+
     // RETURN VALUE
-    
+
 
     /**
-     * Definisce la struttura del valore restituito.
+     * Execute returns.
+     *
+     * @return external_single_structure
      */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
-            'success'    => new external_value(PARAM_BOOL, 'Whether the call succeeded'),
-            'content'    => new external_value(PARAM_RAW, 'AI response content', VALUE_OPTIONAL),
-            'error'      => new external_value(PARAM_TEXT, 'Error message if any', VALUE_OPTIONAL),
-            'tokens_in'  => new external_value(PARAM_INT, 'Input tokens used', VALUE_OPTIONAL),
-            'tokens_out' => new external_value(PARAM_INT, 'Output tokens used', VALUE_OPTIONAL),
-            'model'      => new external_value(PARAM_TEXT, 'Model used', VALUE_OPTIONAL),
+        'success'    => new external_value(PARAM_BOOL, 'Whether the call succeeded'),
+        'content'    => new external_value(PARAM_RAW, 'AI response content', VALUE_OPTIONAL),
+        'error'      => new external_value(PARAM_TEXT, 'Error message if any', VALUE_OPTIONAL),
+        'tokens_in'  => new external_value(PARAM_INT, 'Input tokens used', VALUE_OPTIONAL),
+        'tokens_out' => new external_value(PARAM_INT, 'Output tokens used', VALUE_OPTIONAL),
+        'model'      => new external_value(PARAM_TEXT, 'Model used', VALUE_OPTIONAL),
         ]);
     }
 
-    
+
     // EXECUTE
-    
+
 
     /**
      * Esegue la chiamata AI e restituisce la risposta.

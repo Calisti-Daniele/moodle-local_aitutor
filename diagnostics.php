@@ -5,6 +5,22 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
+/**
+ * Standalone diagnostics page for AI Personal Assistant.
+ *
+ * @package    local_aitutor
+ * @copyright  2026 Daniele Calisti
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 require_once('../../config.php');
 require_once($CFG->dirroot . '/local/aitutor/lib.php');
@@ -38,6 +54,7 @@ echo $OUTPUT->footer();
 
 /**
  * Prepara i dati per il template.
+ * @package local_aitutor
  */
 function build_template_data(array $report): array {
     $checks = [];
@@ -54,8 +71,8 @@ function build_template_data(array $report): array {
             'is_error'     => $check['status'] === 'error',
             'has_fix'      => !empty($check['fix']),
             'has_autofix'  => !empty($check['actions']),
-            'autofix_key'  => $check['actions']['action']       ?? '',
-            'autofix_label'=> $check['actions']['action_label'] ?? '',
+            'autofix_key'  => $check['actions']['action'] ?? '',
+            'autofix_label' => $check['actions']['action_label'] ?? '',
         ];
     }
 
@@ -68,10 +85,12 @@ function build_template_data(array $report): array {
         'warnings_count'  => $report['warnings_count'],
         'checks'          => $checks,
         'provider'        => ucfirst($report['provider']),
-        'settings_url'    => (new moodle_url('/admin/settings.php',
-            ['section' => 'local_aitutor']))->out(false),
-        'str_rerun'       => get_string('diag_rerun',        'local_aitutor'),
-        'str_settings'    => get_string('diag_goto_settings','local_aitutor'),
+        'settings_url'    => (new moodle_url(
+            '/admin/settings.php',
+            ['section' => 'local_aitutor']
+        ))->out(false),
+        'str_rerun'       => get_string('diag_rerun', 'local_aitutor'),
+        'str_settings'    => get_string('diag_goto_settings', 'local_aitutor'),
         'str_fix'         => get_string('diag_fix_automatically', 'local_aitutor'),
     ];
 }

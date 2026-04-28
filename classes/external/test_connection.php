@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Test Connection for AI Personal Assistant.
+ *
+ * @package    local_aitutor
+ * @copyright  2026 Daniele Calisti
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_aitutor\external;
 
 defined('MOODLE_INTERNAL') || die();
@@ -34,6 +42,11 @@ use local_aitutor\ai\provider_factory;
  * @package local_aitutor
  */
 class test_connection extends external_api {
+    /**
+     * Execute parameters.
+     *
+     * @return external_function_parameters
+     */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'provider' => new external_value(
@@ -44,6 +57,11 @@ class test_connection extends external_api {
         ]);
     }
 
+    /**
+     * Execute returns.
+     *
+     * @return external_single_structure
+     */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'success' => new external_value(PARAM_BOOL, 'Connection successful'),
@@ -56,6 +74,13 @@ class test_connection extends external_api {
         ]);
     }
 
+    /**
+     * Execute.
+     *
+     * @param mixed $provider
+     *
+     * @return array
+     */
     public static function execute(string $provider): array {
         $context = \context_system::instance();
         self::validate_context($context);
