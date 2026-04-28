@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+._*
+
+# IDE
+.vscode/
+.idea/
+
+# Node (non serve nel repo del plugin)
+node_modules/
+
+# Log
+*.log
+
+# Wiki (gestita separatamente)
+Wiki/

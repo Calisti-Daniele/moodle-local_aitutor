@@ -1,0 +1,109 @@
+{{!
+    @template local_aitutor/diagnostics
+    Pagina diagnostica completa del plugin.
+}}
+
+<div class="local-aitutor-diagnostics" id="aitutor-diagnostics">
+
+    {{! ── HEADER STATUS ─────────────────────────────────── }}
+    <div class="aitutor-diag-header
+        {{#is_ready}}aitutor-diag-header--ok{{/is_ready}}
+        {{#is_warning}}aitutor-diag-header--warning{{/is_warning}}
+        {{#is_error}}aitutor-diag-header--error{{/is_error}}">
+
+        <div class="aitutor-diag-header-icon">
+            {{#is_ready}}✅{{/is_ready}}
+            {{#is_warning}}⚠️{{/is_warning}}
+            {{#is_error}}❌{{/is_error}}
+        </div>
+
+        <div class="aitutor-diag-header-content">
+            <h2 class="aitutor-diag-title">
+                {{#is_ready}}
+                    {{#str}}diag_status_ready, local_aitutor{{/str}}
+                {{/is_ready}}
+                {{#is_warning}}
+                    {{#str}}diag_status_warning, local_aitutor{{/str}}
+                {{/is_warning}}
+                {{#is_error}}
+                    {{#str}}diag_status_error, local_aitutor{{/str}}
+                {{/is_error}}
+            </h2>
+            <p class="aitutor-diag-summary">{{summary}}</p>
+        </div>
+
+        <div class="aitutor-diag-header-actions">
+            <button class="btn btn-secondary btn-sm"
+                    id="aitutor-diag-rerun">
+                <span class="aitutor-diag-rerun-icon">🔄</span>
+                {{str_rerun}}
+            </button>
+            <a href="{{settings_url}}"
+               class="btn btn-primary btn-sm ml-2">
+                ⚙️ {{str_settings}}
+            </a>
+        </div>
+    </div>
+
+    {{! ── LOADING SPINNER ────────────────────────────────── }}
+    <div class="aitutor-diag-loading d-none" id="aitutor-diag-loading">
+        <div class="spinner-border spinner-border-sm text-primary"
+             role="status">
+            <span class="sr-only">
+                {{#str}}diag_running, local_aitutor{{/str}}
+            </span>
+        </div>
+        <span class="ml-2">
+            {{#str}}diag_running, local_aitutor{{/str}}
+        </span>
+    </div>
+
+    {{! ── CHECKLIST ───────────────────────────────────────── }}
+    <div class="aitutor-diag-checks" id="aitutor-diag-checks">
+        {{#checks}}
+        <div class="aitutor-diag-check
+            {{#is_ok}}aitutor-diag-check--ok{{/is_ok}}
+            {{#is_warning}}aitutor-diag-check--warning{{/is_warning}}
+            {{#is_error}}aitutor-diag-check--error{{/is_error}}"
+            data-key="{{key}}">
+
+            <div class="aitutor-diag-check-header">
+                <span class="aitutor-diag-check-icon"
+                      aria-hidden="true">{{icon}}</span>
+                <span class="aitutor-diag-check-label">{{label}}</span>
+                <span class="aitutor-diag-check-message">{{message}}</span>
+            </div>
+
+            {{#has_fix}}
+            <div class="aitutor-diag-check-fix">
+                <span class="aitutor-diag-fix-icon">💡</span>
+                <span class="aitutor-diag-fix-text">{{fix}}</span>
+
+                {{#has_autofix}}
+                <button class="btn btn-warning btn-sm aitutor-diag-autofix"
+                        data-action="{{autofix_key}}">
+                    🔧 {{autofix_label}}
+                </button>
+                {{/has_autofix}}
+            </div>
+            {{/has_fix}}
+
+        </div>
+        {{/checks}}
+    </div>
+
+    {{! ── FIX GLOBALI ─────────────────────────────────────── }}
+    {{#is_error}}
+    <div class="aitutor-diag-global-actions mt-3">
+        <button class="btn btn-warning"
+                id="aitutor-diag-fix-all">
+            🔧 {{#str}}diag_fix_all, local_aitutor{{/str}}
+        </button>
+    </div>
+    {{/is_error}}
+
+    {{! ── RESULT MESSAGE ──────────────────────────────────── }}
+    <div class="aitutor-diag-result d-none mt-3"
+         id="aitutor-diag-result"></div>
+
+</div>

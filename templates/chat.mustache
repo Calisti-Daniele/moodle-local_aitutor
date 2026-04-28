@@ -1,0 +1,136 @@
+{{!
+    @template mod_aitutor/chat
+
+    Template principale della chat AI Tutor.
+
+    Context variables:
+    * activity_name (string) - Nome dell'attività
+    * mode_label (string) - Etichetta modalità tutor
+    * messages (array) - Lista messaggi
+    * welcome_message (string|null) - Messaggio di benvenuto
+    * str_placeholder (string) - Placeholder textarea
+    * str_send (string) - Label bottone invio
+    * str_thinking (string) - Label "AI sta pensando"
+    * str_clear (string) - Label bottone cancella
+    * sesskey (string) - Sesskey Moodle per sicurezza CSRF
+}}
+
+<div class="mod-aitutor-wrap" 
+     id="mod-aitutor-{{aitutor_id}}"
+     data-cmid="{{cmid}}"
+     data-sessionid="{{session_id}}"
+     data-sesskey="{{sesskey}}">
+
+    {{! ── HEADER ─────────────────────────────────────────── }}
+    <div class="aitutor-header">
+        <div class="aitutor-header-left">
+            <div class="aitutor-avatar-ai">
+                <i class="fa fa-robot" aria-hidden="true"></i>
+            </div>
+            <div class="aitutor-header-info">
+                <h2 class="aitutor-title">{{activity_name}}</h2>
+                <span class="aitutor-mode-badge aitutor-mode-{{mode}}">
+                    {{mode_label}}
+                </span>
+            </div>
+        </div>
+        <div class="aitutor-header-right">
+            {{#show_token_info}}
+            <span class="aitutor-token-info text-muted small">
+                {{#str}}token_usage, aitutor{{/str}}: {{token_count}}
+            </span>
+            {{/show_token_info}}
+            {{#can_clear}}
+            <button class="btn btn-sm btn-outline-secondary aitutor-btn-clear"
+                    data-confirm="{{str_clear_confirm}}"
+                    title="{{str_clear}}">
+                <i class="fa fa-trash" aria-hidden="true"></i>
+                <span class="sr-only">{{str_clear}}</span>
+            </button>
+            {{/can_clear}}
+        </div>
+    </div>
+
+    {{! ── MESSAGGI ───────────────────────────────────────── }}
+    <div class="aitutor-messages" id="aitutor-messages-{{aitutor_id}}" 
+         role="log" aria-live="polite" aria-label="Chat messages">
+
+        {{! Messaggio di benvenuto (chat vuota) }}
+        {{#welcome_message}}
+        <div class="aitutor-message aitutor-message-assistant aitutor-welcome">
+            <div class="aitutor-message-avatar">
+                <i class="fa fa-robot" aria-hidden="true"></i>
+            </div>
+            <div class="aitutor-message-bubble">
+                <p>{{welcome_message}}</p>
+            </div>
+        </div>
+        {{/welcome_message}}
+
+        {{! Lista messaggi esistenti }}
+        {{#messages}}
+        <div class="aitutor-message aitutor-message-{{role}}" 
+             data-role="{{role}}">
+            <div class="aitutor-message-avatar">
+                {{#is_assistant}}
+                <i class="fa fa-robot" aria-hidden="true"></i>
+                {{/is_assistant}}
+                {{#is_user}}
+                <img src="{{avatar}}" class="aitutor-user-avatar" alt="" aria-hidden="true">
+                {{/is_user}}
+            </div>
+            <div class="aitutor-message-bubble">
+                {{{content}}}
+            </div>
+        </div>
+        {{/messages}}
+
+        {{! Indicatore "AI sta pensando..." — nascosto di default }}
+        <div class="aitutor-message aitutor-message-assistant aitutor-thinking d-none"
+             id="aitutor-thinking-{{aitutor_id}}" aria-hidden="true">
+            <div class="aitutor-message-avatar">
+                <i class="fa fa-robot" aria-hidden="true"></i>
+            </div>
+            <div class="aitutor-message-bubble">
+                <span class="aitutor-dots">
+                    <span></span><span></span><span></span>
+                </span>
+                <span class="sr-only">{{str_thinking}}</span>
+            </div>
+        </div>
+
+    </div>
+
+    {{! ── ERRORE ─────────────────────────────────────────── }}
+    <div class="aitutor-error alert alert-danger d-none" 
+         id="aitutor-error-{{aitutor_id}}" role="alert">
+        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+        <span class="aitutor-error-text">{{str_error}}</span>
+    </div>
+
+    {{! ── INPUT ──────────────────────────────────────────── }}
+    <div class="aitutor-input-wrap">
+        <div class="aitutor-input-inner">
+            <label for="aitutor-input-{{aitutor_id}}" class="sr-only">
+                {{str_placeholder}}
+            </label>
+            <textarea
+                id="aitutor-input-{{aitutor_id}}"
+                class="aitutor-input form-control"
+                placeholder="{{str_placeholder}}"
+                rows="1"
+                maxlength="4000"
+                aria-multiline="true"></textarea>
+            <button class="btn btn-primary aitutor-btn-send"
+                    id="aitutor-send-{{aitutor_id}}"
+                    aria-label="{{str_send}}">
+                <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                <span class="aitutor-btn-send-label">{{str_send}}</span>
+            </button>
+        </div>
+        <div class="aitutor-input-hint text-muted small">
+            {{#str}}input_hint, aitutor{{/str}}
+        </div>
+    </div>
+
+</div>

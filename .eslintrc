@@ -1,0 +1,21 @@
+{
+    "root": false,
+    "overrides": [
+        {
+            "files": ["amd/src/*.js", "amd/src/**/*.js"],
+            "parser": "/Users/danielecalisti/moodle-dev/moodle/node_modules/@babel/eslint-parser",
+            "parserOptions": {
+                "sourceType": "module",
+                "requireConfigFile": false,
+                "babelOptions": {
+                    "presets": ["/Users/danielecalisti/moodle-dev/moodle/node_modules/@babel/preset-env"]
+                }
+            },
+            "rules": {
+                "no-invalid-this": "off",
+                "promise/no-native": "off",
+                "promise/avoid-new": "off"
+            }
+        }
+    ]
+}

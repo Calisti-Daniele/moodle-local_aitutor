@@ -1,0 +1,76 @@
+<?php
+namespace local_aitutor\admin;
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Custom admin setting — Bottone test connessione provider AI.
+ *
+ * Renderizza un bottone che, al click, chiama il provider
+ * configurato e mostra l'esito inline nella pagina admin.
+ */
+class setting_test_connection extends \admin_setting {
+
+    public function __construct(string $name, string $visiblename, string $description) {
+        parent::__construct($name, $visiblename, $description, '');
+    }
+
+    /**
+     * Questo setting non salva nulla — è solo un bottone.
+     */
+    public function get_setting(): bool {
+        return true;
+    }
+
+    public function write_setting($data): string {
+        return '';
+    }
+
+    /**
+     * Renderizza il bottone e il contenitore risultati.
+     */
+    public function output_html($data, $query = ''): string {
+        global $PAGE, $OUTPUT;
+
+        // Carica il modulo AMD per il test
+        $PAGE->requires->js_call_amd(
+            'local_aitutor/admin_test',
+            'init'
+        );
+
+        $html  = \html_writer::start_div('local-aitutor-test-wrap');
+
+        // Bottone test
+        $html .= \html_writer::tag('button',
+            get_string('settings_test_connection', 'local_aitutor'),
+            [
+                'type'  => 'button',
+                'class' => 'btn btn-secondary',
+                'id'    => 'aitutor-test-btn',
+            ]
+        );
+
+        // Spinner (nascosto di default)
+        $html .= \html_writer::span(
+            '',
+            'spinner-border spinner-border-sm ml-2 d-none',
+            ['id' => 'aitutor-test-spinner', 'aria-hidden' => 'true']
+        );
+
+        // Risultato (nascosto di default)
+        $html .= \html_writer::div(
+            '',
+            'mt-2 d-none',
+            ['id' => 'aitutor-test-result']
+        );
+
+        $html .= \html_writer::end_div();
+
+        return format_admin_setting(
+            $this,
+            $this->visiblename,
+            $html,
+            $this->description
+        );
+    }
+}
