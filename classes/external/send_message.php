@@ -5,6 +5,14 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace local_aitutor\external;
 
@@ -30,12 +38,12 @@ use local_aitutor\ai\provider_factory;
  * 5. Chiama il provider AI
  * 6. Salva messaggio utente + risposta AI nel DB
  * 7. Restituisce la risposta al JavaScript
+ * @package local_aitutor
  */
 class send_message extends external_api {
-
-    // =========================================================================
+    
     // PARAMETRI INPUT
-    // =========================================================================
+    
 
     /**
      * Definisce i parametri accettati dalla funzione.
@@ -55,9 +63,9 @@ class send_message extends external_api {
         ]);
     }
 
-    // =========================================================================
+    
     // RETURN VALUE
-    // =========================================================================
+    
 
     /**
      * Definisce la struttura del valore restituito.
@@ -65,17 +73,17 @@ class send_message extends external_api {
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'success'    => new external_value(PARAM_BOOL, 'Whether the call succeeded'),
-            'content'    => new external_value(PARAM_RAW,  'AI response content', VALUE_OPTIONAL),
+            'content'    => new external_value(PARAM_RAW, 'AI response content', VALUE_OPTIONAL),
             'error'      => new external_value(PARAM_TEXT, 'Error message if any', VALUE_OPTIONAL),
-            'tokens_in'  => new external_value(PARAM_INT,  'Input tokens used',   VALUE_OPTIONAL),
-            'tokens_out' => new external_value(PARAM_INT,  'Output tokens used',  VALUE_OPTIONAL),
-            'model'      => new external_value(PARAM_TEXT, 'Model used',          VALUE_OPTIONAL),
+            'tokens_in'  => new external_value(PARAM_INT, 'Input tokens used', VALUE_OPTIONAL),
+            'tokens_out' => new external_value(PARAM_INT, 'Output tokens used', VALUE_OPTIONAL),
+            'model'      => new external_value(PARAM_TEXT, 'Model used', VALUE_OPTIONAL),
         ]);
     }
 
-    // =========================================================================
+    
     // EXECUTE
-    // =========================================================================
+    
 
     /**
      * Esegue la chiamata AI e restituisce la risposta.
@@ -87,18 +95,18 @@ class send_message extends external_api {
     public static function execute(int $sessionid, string $message): array {
         global $USER, $DB;
 
-        // ── 1. Valida parametri ──────────────────────────────────────────────
+        // 1. Valida parametri.
         $params = self::validate_parameters(
             self::execute_parameters(),
             ['sessionid' => $sessionid, 'message' => $message]
         );
 
-        // ── 2. Verifica contesto e capability ───────────────────────────────
+        // 2. Verifica contesto e capability.
         $context = \context_system::instance();
         self::validate_context($context);
         require_capability('local/aitutor:use', $context);
 
-        // ── 3. Verifica che la sessione appartenga all'utente corrente ───────
+        // 3. Verifica che la sessione appartenga all'utente corrente.
         $session = $DB->get_record(
             'local_aitutor_sessions',
             ['id' => $params['sessionid'], 'userid' => $USER->id],
@@ -106,7 +114,7 @@ class send_message extends external_api {
             MUST_EXIST
         );
 
-        // ── 4. Sanitize messaggio ────────────────────────────────────────────
+        // 4. Sanitize messaggio.
         $usermessage = clean_param(trim($params['message']), PARAM_TEXT);
 
         if (empty($usermessage)) {
@@ -121,11 +129,11 @@ class send_message extends external_api {
         }
 
         try {
-            // ── 5. Costruisce il contesto completo dell'utente ───────────────
+            // 5. Costruisce il contesto completo dell'utente.
             $contextbuilder = new context_builder($USER);
             $systemprompt   = $contextbuilder->build_system_prompt();
 
-            // ── 6. Recupera la history della conversazione ───────────────────
+            // 6. Recupera la history della conversazione.
             $history = local_aitutor_get_message_history(
                 $session->id,
                 20  // Ultimi 20 messaggi per il contesto
@@ -137,19 +145,19 @@ class send_message extends external_api {
                 'content' => $usermessage,
             ];
 
-            // ── 7. Ottieni il provider AI configurato ────────────────────────
+            // 7. Ottieni il provider AI configurato.
             $provider = provider_factory::get_provider();
 
-            // ── 8. Opzioni dalla configurazione admin ────────────────────────
+            // 8. Opzioni dalla configurazione admin.
             $options = [
                 'maxtokens'   => (int)(get_config('local_aitutor', 'maxtokens') ?: 1000),
                 'temperature' => (float)(get_config('local_aitutor', 'temperature') ?: 0.7),
             ];
 
-            // ── 9. Chiama l'AI ───────────────────────────────────────────────
+            // 9. Chiama l'AI.
             $airesponse = $provider->chat($history, $systemprompt, $options);
 
-            // ── 10. Salva il messaggio utente nel DB ─────────────────────────
+            // 10. Salva il messaggio utente nel DB.
             local_aitutor_save_message(
                 $session->id,
                 'user',
@@ -157,7 +165,7 @@ class send_message extends external_api {
                 $airesponse['tokens_in'] ?? 0
             );
 
-            // ── 11. Salva la risposta AI nel DB ──────────────────────────────
+            // 11. Salva la risposta AI nel DB.
             local_aitutor_save_message(
                 $session->id,
                 'assistant',
@@ -165,26 +173,26 @@ class send_message extends external_api {
                 $airesponse['tokens_out'] ?? 0
             );
 
-            // ── 12. Restituisce la risposta al JS ────────────────────────────
+            // 12. Restituisce la risposta al JS.
             return [
                 'success'    => true,
                 'content'    => $airesponse['content'],
-                'tokens_in'  => $airesponse['tokens_in']  ?? 0,
+                'tokens_in'  => $airesponse['tokens_in'] ?? 0,
                 'tokens_out' => $airesponse['tokens_out'] ?? 0,
-                'model'      => $airesponse['model']      ?? '',
+                'model'      => $airesponse['model'] ?? '',
             ];
-
         } catch (\moodle_exception $e) {
             // Errori Moodle conosciuti (apikey mancante, rate limit, ecc.)
             return [
                 'success' => false,
                 'error'   => $e->getMessage(),
             ];
-
         } catch (\Exception $e) {
             // Errori imprevisti — logga ma non esporre dettagli
-            debugging('local_aitutor send_message error: ' . $e->getMessage(),
-                DEBUG_DEVELOPER);
+            debugging(
+                'local_aitutor send_message error: ' . $e->getMessage(),
+                DEBUG_DEVELOPER
+            );
 
             return [
                 'success' => false,

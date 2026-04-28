@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -8,11 +8,12 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 namespace local_aitutor\ai;
 
 defined('MOODLE_INTERNAL') || die();
@@ -22,9 +23,9 @@ defined('MOODLE_INTERNAL') || die();
  *
  * Usare sempre questa classe invece di istanziare i provider
  * direttamente — gestisce il fallback e la configurazione globale.
+ * @package local_aitutor
  */
 class provider_factory {
-
     /**
      * Restituisce il provider configurato per questa istanza.
      *
@@ -38,7 +39,7 @@ class provider_factory {
         // Determina quale provider usare
         $providername = $override ?: get_config('aitutor', 'provider') ?: 'ollama';
 
-        return match($providername) {
+        return match ($providername) {
             'openai'    => new openai_provider(),
             'anthropic' => new anthropic_provider(),
             'ollama'    => new ollama_provider(),

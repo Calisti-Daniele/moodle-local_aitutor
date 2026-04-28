@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -8,11 +8,12 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 namespace local_aitutor\ai;
 
 defined('MOODLE_INTERNAL') || die();
@@ -28,12 +29,12 @@ defined('MOODLE_INTERNAL') || die();
  * Documentazione API: https://docs.anthropic.com
  * Prezzi: https://www.anthropic.com/pricing
  * API key: https://console.anthropic.com
+ * @package local_aitutor
  */
 class anthropic_provider implements provider_interface {
-
     private string $apikey;
     private string $model;
-    private int    $timeout;
+    private int $timeout;
 
     private const API_BASE    = 'https://api.anthropic.com/v1';
     private const API_VERSION = '2023-06-01';
@@ -44,9 +45,9 @@ class anthropic_provider implements provider_interface {
         $this->timeout  = (int)(get_config('aitutor', 'request_timeout') ?: 60);
     }
 
-    // =========================================================================
+    
     // CHAT
-    // =========================================================================
+    
 
     public function chat(array $messages, string $systemprompt, array $options = []): array {
 
@@ -93,21 +94,26 @@ class anthropic_provider implements provider_interface {
         ];
     }
 
-    // =========================================================================
+    
     // EMBEDDING
     // Anthropic non ha un endpoint embedding nativo.
     // Usiamo un fallback su OpenAI o lanciamo eccezione.
-    // =========================================================================
+    
 
     public function embed(string $text): array {
-        throw new \moodle_exception('error_unavailable', 'aitutor', '', null,
+        throw new \moodle_exception(
+            'error_unavailable',
+            'aitutor',
+            '',
+            null,
             'Anthropic does not provide an embedding API. ' .
-            'Please configure a separate embedding provider (Ollama or OpenAI).');
+            'Please configure a separate embedding provider (Ollama or OpenAI).'
+        );
     }
 
-    // =========================================================================
+    
     // TEST CONNESSIONE
-    // =========================================================================
+    
 
     public function test_connection(): array {
         try {
@@ -135,9 +141,9 @@ class anthropic_provider implements provider_interface {
         }
     }
 
-    // =========================================================================
+    
     // MODELLI DISPONIBILI
-    // =========================================================================
+    
 
     public function get_available_models(): array {
         return [
@@ -165,9 +171,9 @@ class anthropic_provider implements provider_interface {
         return get_string('anthropic_description', 'aitutor');
     }
 
-    // =========================================================================
+    
     // HTTP HELPERS
-    // =========================================================================
+    
 
     private function http_post(string $endpoint, array $payload): array {
         $curl = new \curl();
@@ -194,8 +200,13 @@ class anthropic_provider implements provider_interface {
 
     private function parse_response(string $response, \curl $curl): array {
         if ($curl->get_errno()) {
-            throw new \moodle_exception('error_unavailable', 'aitutor', '', null,
-                'Anthropic connection error: ' . $curl->error);
+            throw new \moodle_exception(
+                'error_unavailable',
+                'aitutor',
+                '',
+                null,
+                'Anthropic connection error: ' . $curl->error
+            );
         }
 
         $info     = $curl->get_info();
@@ -212,13 +223,23 @@ class anthropic_provider implements provider_interface {
 
         if ($httpcode >= 400) {
             $msg = $decoded['error']['message'] ?? $response;
-            throw new \moodle_exception('error_unavailable', 'aitutor', '', null,
-                'Anthropic HTTP ' . $httpcode . ': ' . $msg);
+            throw new \moodle_exception(
+                'error_unavailable',
+                'aitutor',
+                '',
+                null,
+                'Anthropic HTTP ' . $httpcode . ': ' . $msg
+            );
         }
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \moodle_exception('error_unavailable', 'aitutor', '', null,
-                'Invalid JSON from Anthropic');
+            throw new \moodle_exception(
+                'error_unavailable',
+                'aitutor',
+                '',
+                null,
+                'Invalid JSON from Anthropic'
+            );
         }
 
         return $decoded;

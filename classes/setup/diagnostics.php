@@ -5,10 +5,24 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace local_aitutor\setup;
 
 defined('MOODLE_INTERNAL') || die();
+
+/**
+ * @package    local_aitutor
+ * @copyright  2026 Daniele Calisti
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 /**
  * Diagnostics — Motore di diagnostica automatica.
@@ -22,9 +36,9 @@ defined('MOODLE_INTERNAL') || die();
  * - Il banner nelle impostazioni admin
  * - Il wizard di setup
  * - L'endpoint AJAX di health check
+ * @package local_aitutor
  */
 class diagnostics {
-
     /** @var array Risultati dei check */
     private array $results = [];
 
@@ -41,9 +55,9 @@ class diagnostics {
         $this->provider = get_config('local_aitutor', 'provider') ?: 'ollama';
     }
 
-    // =========================================================================
+    
     // ENTRY POINT — Esegui tutti i check
-    // =========================================================================
+    
 
     /**
      * Esegue tutti i check e restituisce il report completo.
@@ -54,26 +68,26 @@ class diagnostics {
     public function run(bool $quickcheck = false): array {
         $this->results = [];
 
-        // ── Check di sistema ─────────────────────────────────────────────────
+        // Check di sistema.
         $this->check_php_version();
         $this->check_php_extensions();
         $this->check_plugin_enabled();
         $this->check_capabilities();
         $this->check_services_registered();
 
-        // ── Check provider ───────────────────────────────────────────────────
+        // Check provider.
         $this->check_provider_configured();
 
         if (!$quickcheck) {
             $this->check_provider_connection();
         }
 
-        // ── Check Moodle security (solo Ollama) ──────────────────────────────
+        // Check Moodle security (solo Ollama).
         if ($this->provider === 'ollama') {
             $this->check_moodle_http_security();
         }
 
-        // ── Calcola stato globale ────────────────────────────────────────────
+        // Calcola stato globale.
         $globalstatus = $this->calculate_global_status();
 
         return [
@@ -87,9 +101,9 @@ class diagnostics {
         ];
     }
 
-    // =========================================================================
+    
     // CHECK 1 — Versione PHP
-    // =========================================================================
+    
 
     private function check_php_version(): void {
         $required = '8.1.0';
@@ -101,18 +115,27 @@ class diagnostics {
             get_string('diag_php_version', 'local_aitutor'),
             $ok ? self::STATUS_OK : self::STATUS_ERROR,
             $ok
-                ? get_string('diag_php_version_ok',    'local_aitutor',
-                    (object)['version' => $current])
-                : get_string('diag_php_version_error', 'local_aitutor',
-                    (object)['current' => $current, 'required' => $required]),
-            $ok ? null : get_string('diag_php_version_fix', 'local_aitutor',
-                (object)['required' => $required])
+                ? get_string(
+                    'diag_php_version_ok',
+                    'local_aitutor',
+                    (object)['version' => $current]
+                )
+                : get_string(
+                    'diag_php_version_error',
+                    'local_aitutor',
+                    (object)['current' => $current, 'required' => $required]
+                ),
+            $ok ? null : get_string(
+                'diag_php_version_fix',
+                'local_aitutor',
+                (object)['required' => $required]
+            )
         );
     }
 
-    // =========================================================================
+    
     // CHECK 2 — Estensioni PHP
-    // =========================================================================
+    
 
     private function check_php_extensions(): void {
         $required = ['curl', 'json', 'mbstring', 'openssl'];
@@ -130,17 +153,23 @@ class diagnostics {
                 'php_extensions',
                 get_string('diag_php_extensions', 'local_aitutor'),
                 self::STATUS_ERROR,
-                get_string('diag_php_extensions_error', 'local_aitutor',
-                    (object)['missing' => implode(', ', $missing)]),
-                get_string('diag_php_extensions_fix', 'local_aitutor',
-                    (object)['missing' => implode(' ', $missing)])
+                get_string(
+                    'diag_php_extensions_error',
+                    'local_aitutor',
+                    (object)['missing' => implode(', ', $missing)]
+                ),
+                get_string(
+                    'diag_php_extensions_fix',
+                    'local_aitutor',
+                    (object)['missing' => implode(' ', $missing)]
+                )
             );
         }
     }
 
-    // =========================================================================
+    
     // CHECK 3 — Plugin abilitato
-    // =========================================================================
+    
 
     private function check_plugin_enabled(): void {
         $enabled = (bool)get_config('local_aitutor', 'enabled');
@@ -150,16 +179,16 @@ class diagnostics {
             get_string('diag_plugin_enabled', 'local_aitutor'),
             $enabled ? self::STATUS_OK : self::STATUS_WARNING,
             $enabled
-                ? get_string('diag_plugin_enabled_ok',      'local_aitutor')
+                ? get_string('diag_plugin_enabled_ok', 'local_aitutor')
                 : get_string('diag_plugin_enabled_warning', 'local_aitutor'),
             $enabled ? null
                 : get_string('diag_plugin_enabled_fix', 'local_aitutor')
         );
     }
 
-    // =========================================================================
+    
     // CHECK 4 — Capabilities
-    // =========================================================================
+    
 
     private function check_capabilities(): void {
         global $DB;
@@ -198,8 +227,11 @@ class diagnostics {
                 'capabilities',
                 get_string('diag_capabilities', 'local_aitutor'),
                 self::STATUS_OK,
-                get_string('diag_capabilities_ok', 'local_aitutor',
-                    (object)['count' => $count])
+                get_string(
+                    'diag_capabilities_ok',
+                    'local_aitutor',
+                    (object)['count' => $count]
+                )
             );
         } else {
             $this->add_result(
@@ -207,14 +239,14 @@ class diagnostics {
                 get_string('diag_capabilities', 'local_aitutor'),
                 self::STATUS_WARNING,
                 get_string('diag_capabilities_warning', 'local_aitutor'),
-                get_string('diag_capabilities_fix',     'local_aitutor')
+                get_string('diag_capabilities_fix', 'local_aitutor')
             );
         }
     }
 
-    // =========================================================================
+    
     // CHECK 5 — Servizi web registrati
-    // =========================================================================
+    
 
     private function check_services_registered(): void {
         global $DB;
@@ -242,24 +274,30 @@ class diagnostics {
                 'services',
                 get_string('diag_services', 'local_aitutor'),
                 self::STATUS_OK,
-                get_string('diag_services_ok', 'local_aitutor',
-                    (object)['count' => count($found)])
+                get_string(
+                    'diag_services_ok',
+                    'local_aitutor',
+                    (object)['count' => count($found)]
+                )
             );
         } else {
             $this->add_result(
                 'services',
                 get_string('diag_services', 'local_aitutor'),
                 self::STATUS_ERROR,
-                get_string('diag_services_error', 'local_aitutor',
-                    (object)['missing' => implode(', ', $missing)]),
+                get_string(
+                    'diag_services_error',
+                    'local_aitutor',
+                    (object)['missing' => implode(', ', $missing)]
+                ),
                 get_string('diag_services_fix', 'local_aitutor')
             );
         }
     }
 
-    // =========================================================================
+    
     // CHECK 6 — Provider configurato
-    // =========================================================================
+    
 
     private function check_provider_configured(): void {
         $provider = $this->provider;
@@ -281,7 +319,7 @@ class diagnostics {
                 $key = get_config('local_aitutor', 'openai_apikey');
                 if (empty($key)) {
                     $issues[] = get_string('diag_provider_no_apikey', 'local_aitutor');
-                } elseif (!str_starts_with($key, 'sk-')) {
+                } else if (!str_starts_with($key, 'sk-')) {
                     $issues[] = get_string('diag_provider_invalid_apikey', 'local_aitutor');
                 }
                 break;
@@ -290,7 +328,7 @@ class diagnostics {
                 $key = get_config('local_aitutor', 'anthropic_apikey');
                 if (empty($key)) {
                     $issues[] = get_string('diag_provider_no_apikey', 'local_aitutor');
-                } elseif (!str_starts_with($key, 'sk-ant-')) {
+                } else if (!str_starts_with($key, 'sk-ant-')) {
                     $issues[] = get_string('diag_provider_invalid_apikey', 'local_aitutor');
                 }
                 break;
@@ -301,8 +339,11 @@ class diagnostics {
                 'provider_config',
                 get_string('diag_provider_config', 'local_aitutor'),
                 self::STATUS_OK,
-                get_string('diag_provider_config_ok', 'local_aitutor',
-                    (object)['provider' => ucfirst($provider)])
+                get_string(
+                    'diag_provider_config_ok',
+                    'local_aitutor',
+                    (object)['provider' => ucfirst($provider)]
+                )
             );
         } else {
             $this->add_result(
@@ -315,9 +356,9 @@ class diagnostics {
         }
     }
 
-    // =========================================================================
+    
     // CHECK 7 — Connessione al provider
-    // =========================================================================
+    
 
     private function check_provider_connection(): void {
         try {
@@ -331,11 +372,14 @@ class diagnostics {
                     'provider_connection',
                     get_string('diag_provider_connection', 'local_aitutor'),
                     self::STATUS_OK,
-                    get_string('diag_provider_connection_ok', 'local_aitutor',
+                    get_string(
+                        'diag_provider_connection_ok',
+                        'local_aitutor',
                         (object)[
                             'provider' => ucfirst($this->provider),
                             'models'   => implode(', ', array_slice($models, 0, 3)),
-                        ])
+                        ]
+                    )
                 );
             } else {
                 $this->add_result(
@@ -357,9 +401,9 @@ class diagnostics {
         }
     }
 
-    // =========================================================================
+    
     // CHECK 8 — Moodle HTTP Security (solo Ollama)
-    // =========================================================================
+    
 
     private function check_moodle_http_security(): void {
         $ollamaurl = get_config('local_aitutor', 'ollama_url')
@@ -402,14 +446,22 @@ class diagnostics {
                 'http_security',
                 get_string('diag_http_security', 'local_aitutor'),
                 self::STATUS_ERROR,
-                get_string('diag_http_security_error', 'local_aitutor',
-                    (object)['host' => $host, 'port' => $port]),
-                get_string('diag_http_security_fix', 'local_aitutor',
-                    (object)['host' => $host, 'port' => $port]),
+                get_string(
+                    'diag_http_security_error',
+                    'local_aitutor',
+                    (object)['host' => $host, 'port' => $port]
+                ),
+                get_string(
+                    'diag_http_security_fix',
+                    'local_aitutor',
+                    (object)['host' => $host, 'port' => $port]
+                ),
                 [
                     'action'       => 'fix_http_security',
-                    'action_label' => get_string('diag_fix_automatically',
-                        'local_aitutor'),
+                    'action_label' => get_string(
+                        'diag_fix_automatically',
+                        'local_aitutor'
+                    ),
                 ]
             );
         } else {
@@ -423,9 +475,9 @@ class diagnostics {
         }
     }
 
-    // =========================================================================
+    
     // FIX AUTOMATICI
-    // =========================================================================
+    
 
     /**
      * Tenta di risolvere automaticamente il problema HTTP security.
@@ -443,7 +495,7 @@ class diagnostics {
 
             // Aggiungi alla allowlist
             $currenthosts = get_config(null, 'curlsecurityblockedhosts') ?? '';
-            $currentports = get_config(null, 'curlsecurityallowedport')  ?? '';
+            $currentports = get_config(null, 'curlsecurityallowedport') ?? '';
 
             // Rimuovi l'host dai bloccati se presente
             $hosts = array_filter(
@@ -463,11 +515,12 @@ class diagnostics {
 
             return [
                 'success' => true,
-                'message' => get_string('diag_fix_http_security_ok',
+                'message' => get_string(
+                    'diag_fix_http_security_ok',
                     'local_aitutor',
-                    (object)['host' => $host, 'port' => $port]),
+                    (object)['host' => $host, 'port' => $port]
+                ),
             ];
-
         } catch (\Exception $e) {
             return [
                 'success' => false,
@@ -492,7 +545,6 @@ class diagnostics {
                 'success' => true,
                 'message' => get_string('diag_fix_services_ok', 'local_aitutor'),
             ];
-
         } catch (\Exception $e) {
             return [
                 'success' => false,
@@ -510,8 +562,12 @@ class diagnostics {
         global $DB;
 
         try {
-            $studentrole = $DB->get_record('role', ['shortname' => 'student'],
-                '*', MUST_EXIST);
+            $studentrole = $DB->get_record(
+                'role',
+                ['shortname' => 'student'],
+                '*',
+                MUST_EXIST
+            );
             $context     = \context_system::instance();
 
             assign_capability(
@@ -526,7 +582,6 @@ class diagnostics {
                 'success' => true,
                 'message' => get_string('diag_fix_capabilities_ok', 'local_aitutor'),
             ];
-
         } catch (\Exception $e) {
             return [
                 'success' => false,
@@ -535,20 +590,20 @@ class diagnostics {
         }
     }
 
-    // =========================================================================
+    
     // HELPERS
-    // =========================================================================
+    
 
     /**
      * Aggiunge un risultato alla lista check.
      */
     private function add_result(
-        string  $key,
-        string  $label,
-        string  $status,
-        string  $message,
-        ?string $fix     = null,
-        array   $actions = []
+        string $key,
+        string $label,
+        string $status,
+        string $message,
+        ?string $fix = null,
+        array $actions = []
     ): void {
         $this->results[$key] = [
             'key'     => $key,
@@ -565,7 +620,7 @@ class diagnostics {
      * Restituisce un'icona per ogni stato.
      */
     private function status_icon(string $status): string {
-        return match($status) {
+        return match ($status) {
             self::STATUS_OK      => '✅',
             self::STATUS_WARNING => '⚠️',
             self::STATUS_ERROR   => '❌',
@@ -605,16 +660,19 @@ class diagnostics {
      * Costruisce il messaggio di riepilogo.
      */
     private function build_summary(string $globalstatus): string {
-        return match($globalstatus) {
+        return match ($globalstatus) {
             self::STATUS_OK => get_string(
-                'diag_summary_ok', 'local_aitutor'
+                'diag_summary_ok',
+                'local_aitutor'
             ),
             self::STATUS_WARNING => get_string(
-                'diag_summary_warning', 'local_aitutor',
+                'diag_summary_warning',
+                'local_aitutor',
                 (object)['count' => $this->count_by_status(self::STATUS_WARNING)]
             ),
             self::STATUS_ERROR => get_string(
-                'diag_summary_error', 'local_aitutor',
+                'diag_summary_error',
+                'local_aitutor',
                 (object)['count' => $this->count_by_status(self::STATUS_ERROR)]
             ),
             default => '',
@@ -632,8 +690,10 @@ class diagnostics {
         }
 
         if (str_contains($msg, 'refused') || str_contains($msg, 'connect')) {
-            return get_string('diag_fix_refused_' . $this->provider,
-                'local_aitutor');
+            return get_string(
+                'diag_fix_refused_' . $this->provider,
+                'local_aitutor'
+            );
         }
 
         if (str_contains($msg, 'api key') || str_contains($msg, 'unauthorized')) {

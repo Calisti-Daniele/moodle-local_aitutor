@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -8,11 +8,12 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 namespace local_aitutor\external;
 
 defined('MOODLE_INTERNAL') || die();
@@ -30,9 +31,9 @@ use local_aitutor\ai\provider_factory;
  * Web API: test_connection
  * Testa la connessione al provider AI configurato.
  * Usata dalla pagina admin settings.
+ * @package local_aitutor
  */
 class test_connection extends external_api {
-
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'provider' => new external_value(
@@ -69,7 +70,6 @@ class test_connection extends external_api {
                 'message' => $result['message'],
                 'models'  => $result['models'] ?? [],
             ];
-
         } catch (\Exception $e) {
             return [
                 'success' => false,

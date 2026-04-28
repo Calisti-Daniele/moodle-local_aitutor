@@ -5,6 +5,14 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace local_aitutor\ai;
 
@@ -22,9 +30,9 @@ defined('MOODLE_INTERNAL') || die();
  * - Voti e feedback ricevuti
  * - Scadenze imminenti
  * - Certificati ottenuti
+ * @package local_aitutor
  */
 class context_builder {
-
     /** @var \stdClass Utente corrente */
     private \stdClass $user;
 
@@ -44,9 +52,9 @@ class context_builder {
         $this->user = $user;
     }
 
-    // =========================================================================
+    
     // ENTRY POINT PRINCIPALE
-    // =========================================================================
+    
 
     /**
      * Costruisce il system prompt completo per l'AI.
@@ -92,9 +100,9 @@ class context_builder {
         return $prompt;
     }
 
-    // =========================================================================
+    
     // BLOCCO 1 — Identità assistente
-    // =========================================================================
+    
 
     private function build_identity_block(): string {
         $sitename = format_string(get_site()->fullname);
@@ -115,9 +123,9 @@ class context_builder {
         PROMPT;
     }
 
-    // =========================================================================
+    
     // BLOCCO 2 — Profilo utente
-    // =========================================================================
+    
 
     private function build_user_profile_block(): string {
         $fullname  = fullname($this->user);
@@ -143,9 +151,9 @@ class context_builder {
         PROMPT;
     }
 
-    // =========================================================================
+    
     // BLOCCO 3 — Corsi iscritti + progressi
-    // =========================================================================
+    
 
     private function build_courses_block(): string {
         $courses = $this->get_enrolled_courses();
@@ -178,9 +186,9 @@ class context_builder {
         return $block;
     }
 
-    // =========================================================================
+    
     // BLOCCO 4 — Voti e feedback
-    // =========================================================================
+    
 
     private function build_grades_block(): string {
         $courses = $this->get_enrolled_courses();
@@ -225,9 +233,9 @@ class context_builder {
         return $block;
     }
 
-    // =========================================================================
+    
     // BLOCCO 5 — Scadenze imminenti
-    // =========================================================================
+    
 
     private function build_deadlines_block(): string {
         $deadlines = $this->get_upcoming_deadlines();
@@ -239,8 +247,10 @@ class context_builder {
         $block = "# UPCOMING DEADLINES\n";
 
         foreach ($deadlines as $deadline) {
-            $duedate  = userdate($deadline['duedate'],
-                get_string('strftimedatetime', 'langconfig'));
+            $duedate  = userdate(
+                $deadline['duedate'],
+                get_string('strftimedatetime', 'langconfig')
+            );
             $overdue  = $deadline['duedate'] < time() ? ' ⚠️ OVERDUE' : '';
             $daysleft = $this->days_until($deadline['duedate']);
 
@@ -253,9 +263,9 @@ class context_builder {
         return $block;
     }
 
-    // =========================================================================
+    
     // BLOCCO 6 — Certificati
-    // =========================================================================
+    
 
     private function build_certificates_block(): string {
         $certificates = $this->get_certificates();
@@ -267,17 +277,19 @@ class context_builder {
         $block = "# CERTIFICATES EARNED (" . count($certificates) . ")\n";
 
         foreach ($certificates as $cert) {
-            $date   = userdate($cert['timecreated'],
-                get_string('strftimedate', 'langconfig'));
+            $date   = userdate(
+                $cert['timecreated'],
+                get_string('strftimedate', 'langconfig')
+            );
             $block .= "- ✅ {$cert['name']} ({$cert['coursename']}) — earned: {$date}\n";
         }
 
         return $block;
     }
 
-    // =========================================================================
+    
     // BLOCCO 7 — Regole comportamentali
-    // =========================================================================
+    
 
     private function build_behaviour_block(): string {
         return <<<PROMPT
@@ -293,9 +305,9 @@ class context_builder {
         PROMPT;
     }
 
-    // =========================================================================
+    
     // DATA FETCHERS — Recupero dati da Moodle
-    // =========================================================================
+    
 
     /**
      * Recupera tutti i corsi a cui è iscritto l'utente.
@@ -388,8 +400,10 @@ class context_builder {
             return null;
         }
 
-        return userdate($record->timeaccess,
-            get_string('strftimedate', 'langconfig'));
+        return userdate(
+            $record->timeaccess,
+            get_string('strftimedate', 'langconfig')
+        );
     }
 
     /**
@@ -486,7 +500,8 @@ class context_builder {
             'grade'    => round((float)$r->grade, 1),
             'max'      => round((float)$r->max, 1),
             'feedback' => $this->truncate(
-                strip_tags($r->feedback ?? ''), 100
+                strip_tags($r->feedback ?? ''),
+                100
             ),
         ], $records));
     }
@@ -597,8 +612,10 @@ class context_builder {
                      WHERE ci.userid = :userid
                   ORDER BY ci.timecreated DESC";
 
-            $records = $DB->get_records_sql($sql,
-                ['userid' => $this->user->id]);
+            $records = $DB->get_records_sql(
+                $sql,
+                ['userid' => $this->user->id]
+            );
 
             foreach ($records as $r) {
                 $certificates[] = [
@@ -620,8 +637,10 @@ class context_builder {
                      WHERE ci.userid = :userid
                   ORDER BY ci.timecreated DESC";
 
-            $records = $DB->get_records_sql($sql,
-                ['userid' => $this->user->id]);
+            $records = $DB->get_records_sql(
+                $sql,
+                ['userid' => $this->user->id]
+            );
 
             foreach ($records as $r) {
                 $certificates[] = [
@@ -643,8 +662,10 @@ class context_builder {
                        AND cc.timecompleted IS NOT NULL
                   ORDER BY cc.timecompleted DESC";
 
-            $records = $DB->get_records_sql($sql,
-                ['userid' => $this->user->id]);
+            $records = $DB->get_records_sql(
+                $sql,
+                ['userid' => $this->user->id]
+            );
 
             foreach ($records as $r) {
                 $certificates[] = [
@@ -658,9 +679,9 @@ class context_builder {
         return $certificates;
     }
 
-    // =========================================================================
+    
     // UTILITY
-    // =========================================================================
+    
 
     /**
      * Tronca un testo a una lunghezza massima rispettando le parole.

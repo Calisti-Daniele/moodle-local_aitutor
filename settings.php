@@ -5,14 +5,23 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 defined('MOODLE_INTERNAL') || die();
 
 global $ADMIN, $CFG;
 
-/** @var bool $hassiteconfig */
+/** @var bool $hassiteconfig * @package local_aitutor
+ * @package local_aitutor
+ */
 if ($hassiteconfig) {
-
     // =========================================================================
     // PAGINA IMPOSTAZIONI PRINCIPALE
     // =========================================================================
@@ -28,7 +37,6 @@ if ($hassiteconfig) {
     // Mostrato in cima alla pagina se il plugin non è configurato correttamente
     // =========================================================================
     if ($hassiteconfig) {
-
         // Esegui quick check per il banner
         $diagcheck = new \local_aitutor\setup\diagnostics();
         $report    = $diagcheck->run(quickcheck: true);
@@ -36,7 +44,6 @@ if ($hassiteconfig) {
         $diagurl   = new moodle_url('/local/aitutor/diagnostics.php');
 
         if (!$report['ready']) {
-
             // Banner errore/warning
             $bannerclass = $report['status'] === 'error'
                 ? 'alert-danger'
@@ -48,8 +55,10 @@ if ($hassiteconfig) {
                                 align-items-center justify-content-between mb-4">';
             $bannerhtml .= '<div>';
             $bannerhtml .= '<strong>' . $bannericon . ' ';
-            $bannerhtml .= get_string('diag_banner_title_' . $report['status'],
-                'local_aitutor') . '</strong><br>';
+            $bannerhtml .= get_string(
+                'diag_banner_title_' . $report['status'],
+                'local_aitutor'
+            ) . '</strong><br>';
             $bannerhtml .= '<small>' . $report['summary'] . '</small>';
             $bannerhtml .= '</div>';
             $bannerhtml .= '<a href="' . $diagurl->out(false) . '"
@@ -65,9 +74,7 @@ if ($hassiteconfig) {
                 '',
                 $bannerhtml
             ));
-
         } else {
-
             // Banner verde — tutto OK
             $bannerhtml  = '<div class="alert alert-success mb-4">';
             $bannerhtml .= '✅ <strong>';
@@ -119,11 +126,11 @@ if ($hassiteconfig) {
         get_string('settings_temperature_desc', 'local_aitutor'),
         '0.7',
         [
-            '0.0' => get_string('temperature_precise',  'local_aitutor'),
-            '0.3' => get_string('temperature_focused',  'local_aitutor'),
+            '0.0' => get_string('temperature_precise', 'local_aitutor'),
+            '0.3' => get_string('temperature_focused', 'local_aitutor'),
             '0.7' => get_string('temperature_balanced', 'local_aitutor'),
             '1.0' => get_string('temperature_creative', 'local_aitutor'),
-            '1.5' => get_string('temperature_wild',     'local_aitutor'),
+            '1.5' => get_string('temperature_wild', 'local_aitutor'),
         ]
     ));
 
@@ -141,7 +148,7 @@ if ($hassiteconfig) {
         'local_aitutor/provider',
         get_string('settings_provider', 'local_aitutor'),
         get_string('settings_provider_desc', 'local_aitutor'),
-        'ollama',  // Default: Ollama (gratuito, self-hosted)
+        'ollama', // Default: Ollama (gratuito, self-hosted)
         [
             'ollama'    => '🦙 Ollama — ' . get_string('provider_ollama_label', 'local_aitutor'),
             'openai'    => '🤖 OpenAI — ' . get_string('provider_openai_label', 'local_aitutor'),
@@ -163,7 +170,7 @@ if ($hassiteconfig) {
         'local_aitutor/ollama_url',
         get_string('settings_ollama_url', 'local_aitutor'),
         get_string('settings_ollama_url_desc', 'local_aitutor'),
-        'http://ollama:11434',  // Default per Docker
+        'http://ollama:11434', // Default per Docker
         PARAM_URL
     ));
 
@@ -176,37 +183,37 @@ if ($hassiteconfig) {
         [
             // Llama — Meta
             'llama3.2'      => 'Llama 3.2 3B — ' .
-                get_string('model_llama32_desc',     'local_aitutor'),
+                get_string('model_llama32_desc', 'local_aitutor'),
             'llama3.2:1b'   => 'Llama 3.2 1B — ' .
-                get_string('model_llama32_1b_desc',  'local_aitutor'),
+                get_string('model_llama32_1b_desc', 'local_aitutor'),
             'llama3.1'      => 'Llama 3.1 8B — ' .
-                get_string('model_llama31_desc',     'local_aitutor'),
+                get_string('model_llama31_desc', 'local_aitutor'),
             'llama3.1:70b'  => 'Llama 3.1 70B — ' .
                 get_string('model_llama31_70b_desc', 'local_aitutor'),
 
             // Mistral
             'mistral'       => 'Mistral 7B — ' .
-                get_string('model_mistral_desc',     'local_aitutor'),
+                get_string('model_mistral_desc', 'local_aitutor'),
             'mistral-nemo'  => 'Mistral Nemo 12B — ' .
-                get_string('model_mistral_nemo_desc','local_aitutor'),
+                get_string('model_mistral_nemo_desc', 'local_aitutor'),
 
             // Gemma — Google
             'gemma2'        => 'Gemma 2 9B — ' .
-                get_string('model_gemma2_desc',      'local_aitutor'),
+                get_string('model_gemma2_desc', 'local_aitutor'),
             'gemma2:2b'     => 'Gemma 2 2B — ' .
-                get_string('model_gemma2_2b_desc',   'local_aitutor'),
+                get_string('model_gemma2_2b_desc', 'local_aitutor'),
 
             // Phi — Microsoft
             'phi3'          => 'Phi-3 Mini 3.8B — ' .
-                get_string('model_phi3_desc',        'local_aitutor'),
+                get_string('model_phi3_desc', 'local_aitutor'),
             'phi3:medium'   => 'Phi-3 Medium 14B — ' .
                 get_string('model_phi3_medium_desc', 'local_aitutor'),
 
             // Qwen — Alibaba
             'qwen2.5'       => 'Qwen 2.5 7B — ' .
-                get_string('model_qwen25_desc',      'local_aitutor'),
+                get_string('model_qwen25_desc', 'local_aitutor'),
             'qwen2.5:14b'   => 'Qwen 2.5 14B — ' .
-                get_string('model_qwen25_14b_desc',  'local_aitutor'),
+                get_string('model_qwen25_14b_desc', 'local_aitutor'),
 
             // DeepSeek
             'deepseek-r1'   => 'DeepSeek R1 7B — ' .
@@ -222,9 +229,9 @@ if ($hassiteconfig) {
         'nomic-embed-text',
         [
             'nomic-embed-text'  => 'Nomic Embed Text — ' .
-                get_string('embed_nomic_desc',  'local_aitutor'),
+                get_string('embed_nomic_desc', 'local_aitutor'),
             'mxbai-embed-large' => 'MxBai Embed Large — ' .
-                get_string('embed_mxbai_desc',  'local_aitutor'),
+                get_string('embed_mxbai_desc', 'local_aitutor'),
             'all-minilm'        => 'All MiniLM — ' .
                 get_string('embed_minilm_desc', 'local_aitutor'),
         ]
@@ -255,17 +262,17 @@ if ($hassiteconfig) {
         'gpt-4o-mini',
         [
             'gpt-4o'        => 'GPT-4o — ' .
-                get_string('model_gpt4o_desc',      'local_aitutor'),
+                get_string('model_gpt4o_desc', 'local_aitutor'),
             'gpt-4o-mini'   => 'GPT-4o Mini — ' .
                 get_string('model_gpt4o_mini_desc', 'local_aitutor'),
             'gpt-4-turbo'   => 'GPT-4 Turbo — ' .
-                get_string('model_gpt4turbo_desc',  'local_aitutor'),
+                get_string('model_gpt4turbo_desc', 'local_aitutor'),
             'gpt-3.5-turbo' => 'GPT-3.5 Turbo — ' .
                 get_string('model_gpt35turbo_desc', 'local_aitutor'),
             'o1-mini'       => 'o1 Mini — ' .
-                get_string('model_o1mini_desc',     'local_aitutor'),
+                get_string('model_o1mini_desc', 'local_aitutor'),
             'o1-preview'    => 'o1 Preview — ' .
-                get_string('model_o1preview_desc',  'local_aitutor'),
+                get_string('model_o1preview_desc', 'local_aitutor'),
         ]
     ));
 
@@ -296,13 +303,13 @@ if ($hassiteconfig) {
             'claude-3-5-sonnet-latest' => 'Claude 3.5 Sonnet — ' .
                 get_string('model_claude35sonnet_desc', 'local_aitutor'),
             'claude-3-5-haiku-latest'  => 'Claude 3.5 Haiku — ' .
-                get_string('model_claude35haiku_desc',  'local_aitutor'),
+                get_string('model_claude35haiku_desc', 'local_aitutor'),
             'claude-3-opus-latest'     => 'Claude 3 Opus — ' .
-                get_string('model_claude3opus_desc',    'local_aitutor'),
+                get_string('model_claude3opus_desc', 'local_aitutor'),
             'claude-3-sonnet-20240229' => 'Claude 3 Sonnet — ' .
-                get_string('model_claude3sonnet_desc',  'local_aitutor'),
+                get_string('model_claude3sonnet_desc', 'local_aitutor'),
             'claude-3-haiku-20240307'  => 'Claude 3 Haiku — ' .
-                get_string('model_claude3haiku_desc',   'local_aitutor'),
+                get_string('model_claude3haiku_desc', 'local_aitutor'),
         ]
     ));
 

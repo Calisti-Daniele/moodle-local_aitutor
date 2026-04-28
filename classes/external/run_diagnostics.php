@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -8,11 +8,12 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 namespace local_aitutor\external;
 
 defined('MOODLE_INTERNAL') || die();
@@ -30,9 +31,9 @@ use local_aitutor\setup\diagnostics;
 /**
  * Web API: run_diagnostics
  * Esegue la diagnostica completa e restituisce il report.
+ * @package local_aitutor
  */
 class run_diagnostics extends external_api {
-
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'quickcheck' => new external_value(
@@ -42,7 +43,7 @@ class run_diagnostics extends external_api {
                 false
             ),
             'fix' => new external_value(
-                PARAM_ALPHANUMEXT,  // ← accetta lettere, numeri, underscore, trattini
+                PARAM_ALPHANUMEXT, // ← accetta lettere, numeri, underscore, trattini
                 'Auto-fix action',
                 VALUE_DEFAULT,
                 ''
@@ -55,16 +56,19 @@ class run_diagnostics extends external_api {
             'status'         => new external_value(PARAM_TEXT, 'Global status'),
             'ready'          => new external_value(PARAM_BOOL, 'Plugin ready'),
             'summary'        => new external_value(PARAM_TEXT, 'Summary message'),
-            'errors_count'   => new external_value(PARAM_INT,  'Error count'),
-            'warnings_count' => new external_value(PARAM_INT,  'Warning count'),
+            'errors_count'   => new external_value(PARAM_INT, 'Error count'),
+            'warnings_count' => new external_value(PARAM_INT, 'Warning count'),
             'checks'         => new external_multiple_structure(
                 new external_single_structure([
                     'key'     => new external_value(PARAM_TEXT, 'Check key'),
                     'label'   => new external_value(PARAM_TEXT, 'Check label'),
                     'status'  => new external_value(PARAM_TEXT, 'Check status'),
                     'message' => new external_value(PARAM_TEXT, 'Check message'),
-                    'fix'     => new external_value(PARAM_TEXT, 'Fix instruction',
-                        VALUE_OPTIONAL),
+                    'fix'     => new external_value(
+                        PARAM_TEXT,
+                        'Fix instruction',
+                        VALUE_OPTIONAL
+                    ),
                     'icon'    => new external_value(PARAM_TEXT, 'Status icon'),
                 ])
             ),
@@ -72,8 +76,8 @@ class run_diagnostics extends external_api {
     }
 
     public static function execute(
-        bool   $quickcheck = false,
-        string $fix        = ''
+        bool $quickcheck = false,
+        string $fix = ''
     ): array {
         $context = \context_system::instance();
         self::validate_context($context);

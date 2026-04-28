@@ -5,6 +5,14 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace local_aitutor\ai;
 
@@ -19,9 +27,9 @@ defined('MOODLE_INTERNAL') || die();
  *
  * Documentazione: https://ollama.com
  * Modelli disponibili: https://ollama.com/library
+ * @package local_aitutor
  */
 class ollama_provider implements provider_interface {
-
     /** @var string URL base dell'istanza Ollama */
     private string $baseurl;
 
@@ -38,16 +46,17 @@ class ollama_provider implements provider_interface {
         $configurl = get_config('local_aitutor', 'ollama_url');
 
         // Debug temporaneo
+        error_log('AITUTOR ollama_url from config: [' . $configurl . ']');
 
         $this->baseurl        = rtrim($configurl ?: 'http://ollama:11434', '/');
-        $this->model          = get_config('local_aitutor', 'ollama_model')       ?: 'llama3.2';
+        $this->model          = get_config('local_aitutor', 'ollama_model') ?: 'llama3.2';
         $this->embeddingmodel = get_config('local_aitutor', 'ollama_embed_model') ?: 'nomic-embed-text';
         $this->timeout        = (int)(get_config('local_aitutor', 'request_timeout') ?: 60);
     }
 
-    // =========================================================================
+    
     // CHAT
-    // =========================================================================
+    
 
     public function chat(array $messages, string $systemprompt, array $options = []): array {
 
@@ -74,7 +83,7 @@ class ollama_provider implements provider_interface {
         $payload = [
             'model'    => $this->model,
             'messages' => $payload_messages,
-            'stream'   => false,   // Risposta completa, non streaming
+            'stream'   => false, // Risposta completa, non streaming
             'options'  => [
                 'num_predict' => $maxtokens,
                 'temperature' => $temperature,
@@ -91,9 +100,9 @@ class ollama_provider implements provider_interface {
         ];
     }
 
-    // =========================================================================
+    
     // EMBEDDING
-    // =========================================================================
+    
 
     public function embed(string $text): array {
 
@@ -108,16 +117,21 @@ class ollama_provider implements provider_interface {
         $embeddings = $response['embeddings'][0] ?? [];
 
         if (empty($embeddings)) {
-            throw new \moodle_exception('error_embedding', 'local_aitutor',
-                '', null, 'Ollama returned empty embedding');
+            throw new \moodle_exception(
+                'error_embedding',
+                'local_aitutor',
+                '',
+                null,
+                'Ollama returned empty embedding'
+            );
         }
 
         return $embeddings;
     }
 
-    // =========================================================================
+    
     // TEST CONNESSIONE
-    // =========================================================================
+    
 
     public function test_connection(): array {
         try {
@@ -155,11 +169,13 @@ class ollama_provider implements provider_interface {
 
             return [
                 'success' => true,
-                'message' => get_string('ollama_connected', 'local_aitutor',
-                    (object)['count' => count($models)]),
+                'message' => get_string(
+                    'ollama_connected',
+                    'local_aitutor',
+                    (object)['count' => count($models)]
+                ),
                 'models'  => $models,
             ];
-
         } catch (\Exception $e) {
             return [
                 'success' => false,
@@ -169,9 +185,9 @@ class ollama_provider implements provider_interface {
         }
     }
 
-    // =========================================================================
+    
     // MODELLI DISPONIBILI
-    // =========================================================================
+    
 
     public function get_available_models(): array {
         return [
@@ -210,9 +226,9 @@ class ollama_provider implements provider_interface {
         ];
     }
 
-    // =========================================================================
+    
     // INFO PROVIDER
-    // =========================================================================
+    
 
     public function get_name(): string {
         return 'Ollama (self-hosted)';
@@ -222,9 +238,9 @@ class ollama_provider implements provider_interface {
         return get_string('ollama_description', 'local_aitutor');
     }
 
-    // =========================================================================
+    
     // HTTP HELPERS PRIVATI
-    // =========================================================================
+    
 
     /**
      * Esegue una POST verso l'API Ollama.
@@ -288,23 +304,38 @@ class ollama_provider implements provider_interface {
     ): array {
         // Errore di connessione
         if ($errno || $response === false) {
-            throw new \moodle_exception('error_unavailable', 'local_aitutor',
-                '', null, 'Ollama connection error: ' . $error);
+            throw new \moodle_exception(
+                'error_unavailable',
+                'local_aitutor',
+                '',
+                null,
+                'Ollama connection error: ' . $error
+            );
         }
 
         // Errore HTTP
         if ($httpcode >= 400) {
             $decoded = json_decode($response, true);
             $msg     = $decoded['error'] ?? $response;
-            throw new \moodle_exception('error_unavailable', 'local_aitutor',
-                '', null, 'Ollama HTTP ' . $httpcode . ': ' . $msg);
+            throw new \moodle_exception(
+                'error_unavailable',
+                'local_aitutor',
+                '',
+                null,
+                'Ollama HTTP ' . $httpcode . ': ' . $msg
+            );
         }
 
         // Decodifica JSON
         $decoded = json_decode($response, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \moodle_exception('error_unavailable', 'local_aitutor',
-                '', null, 'Invalid JSON from Ollama: ' . json_last_error_msg());
+            throw new \moodle_exception(
+                'error_unavailable',
+                'local_aitutor',
+                '',
+                null,
+                'Invalid JSON from Ollama: ' . json_last_error_msg()
+            );
         }
 
         return $decoded;
@@ -323,23 +354,38 @@ class ollama_provider implements provider_interface {
 
         // Errore di connessione (timeout, host non raggiungibile, ecc.)
         if ($curl->get_errno()) {
-            throw new \moodle_exception('error_unavailable', 'local_aitutor', '', null,
-                'Ollama connection error: ' . $curl->error);
+            throw new \moodle_exception(
+                'error_unavailable',
+                'local_aitutor',
+                '',
+                null,
+                'Ollama connection error: ' . $curl->error
+            );
         }
 
         // Errore HTTP
         $httpcode = $info['http_code'] ?? 0;
         if ($httpcode >= 400) {
             $error = json_decode($response, true);
-            throw new \moodle_exception('error_unavailable', 'local_aitutor', '', null,
-                'Ollama HTTP ' . $httpcode . ': ' . ($error['error'] ?? $response));
+            throw new \moodle_exception(
+                'error_unavailable',
+                'local_aitutor',
+                '',
+                null,
+                'Ollama HTTP ' . $httpcode . ': ' . ($error['error'] ?? $response)
+            );
         }
 
         // Decodifica JSON
         $decoded = json_decode($response, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \moodle_exception('error_unavailable', 'local_aitutor', '', null,
-                'Invalid JSON from Ollama: ' . json_last_error_msg());
+            throw new \moodle_exception(
+                'error_unavailable',
+                'local_aitutor',
+                '',
+                null,
+                'Invalid JSON from Ollama: ' . json_last_error_msg()
+            );
         }
 
         return $decoded;

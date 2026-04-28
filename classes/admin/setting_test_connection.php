@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -8,11 +8,12 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 namespace local_aitutor\admin;
 
 defined('MOODLE_INTERNAL') || die();
@@ -22,9 +23,9 @@ defined('MOODLE_INTERNAL') || die();
  *
  * Renderizza un bottone che, al click, chiama il provider
  * configurato e mostra l'esito inline nella pagina admin.
+ * @package local_aitutor
  */
 class setting_test_connection extends \admin_setting {
-
     public function __construct(string $name, string $visiblename, string $description) {
         parent::__construct($name, $visiblename, $description, '');
     }
@@ -55,7 +56,8 @@ class setting_test_connection extends \admin_setting {
         $html  = \html_writer::start_div('local-aitutor-test-wrap');
 
         // Bottone test
-        $html .= \html_writer::tag('button',
+        $html .= \html_writer::tag(
+            'button',
             get_string('settings_test_connection', 'local_aitutor'),
             [
                 'type'  => 'button',

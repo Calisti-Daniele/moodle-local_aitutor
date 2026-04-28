@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -8,11 +8,12 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 namespace local_aitutor\external;
 
 defined('MOODLE_INTERNAL') || die();
@@ -29,9 +30,9 @@ use external_value;
  *
  * Cancella tutti i messaggi della sessione corrente
  * e crea una nuova sessione pulita per l'utente.
+ * @package local_aitutor
  */
 class clear_session extends external_api {
-
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'sessionid' => new external_value(
@@ -45,8 +46,8 @@ class clear_session extends external_api {
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'success'       => new external_value(PARAM_BOOL, 'Whether cleared successfully'),
-            'new_sessionid' => new external_value(PARAM_INT,  'New session ID', VALUE_OPTIONAL),
-            'error'         => new external_value(PARAM_TEXT, 'Error message',  VALUE_OPTIONAL),
+            'new_sessionid' => new external_value(PARAM_INT, 'New session ID', VALUE_OPTIONAL),
+            'error'         => new external_value(PARAM_TEXT, 'Error message', VALUE_OPTIONAL),
         ]);
     }
 
@@ -90,7 +91,6 @@ class clear_session extends external_api {
                 'success'       => true,
                 'new_sessionid' => $newsession->id,
             ];
-
         } catch (\Exception $e) {
             return [
                 'success' => false,

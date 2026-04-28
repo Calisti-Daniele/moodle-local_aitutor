@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -8,11 +8,12 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 namespace local_aitutor\external;
 
 defined('MOODLE_INTERNAL') || die();
@@ -30,9 +31,9 @@ use external_value;
  *
  * Recupera la storia dei messaggi di una sessione.
  * Utile per ricaricare la chat dopo un refresh della pagina.
+ * @package local_aitutor
  */
 class get_history extends external_api {
-
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'sessionid' => new external_value(
@@ -55,8 +56,8 @@ class get_history extends external_api {
             'messages' => new external_multiple_structure(
                 new external_single_structure([
                     'role'        => new external_value(PARAM_TEXT, 'user|assistant'),
-                    'content'     => new external_value(PARAM_RAW,  'Message content'),
-                    'timecreated' => new external_value(PARAM_INT,  'Timestamp'),
+                    'content'     => new external_value(PARAM_RAW, 'Message content'),
+                    'timecreated' => new external_value(PARAM_INT, 'Timestamp'),
                 ]),
                 'Message list',
                 VALUE_OPTIONAL
@@ -105,7 +106,6 @@ class get_history extends external_api {
                 'success'  => true,
                 'messages' => $messages,
             ];
-
         } catch (\Exception $e) {
             return [
                 'success' => false,

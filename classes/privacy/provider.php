@@ -5,10 +5,24 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace local_aitutor\privacy;
 
 defined('MOODLE_INTERNAL') || die();
+
+/**
+ * @package    local_aitutor
+ * @copyright  2026 Daniele Calisti
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
@@ -30,6 +44,7 @@ use core_privacy\local\request\writer;
  * Dati trattati:
  * - local_aitutor_sessions: sessioni di conversazione (userid)
  * - local_aitutor_messages: messaggi inviati e ricevuti
+ * @package local_aitutor
  */
 class provider implements
     // Dichiara quali dati personali tratta il plugin
@@ -40,10 +55,9 @@ class provider implements
 
     // Permette operazioni su liste di utenti (per admin)
     \core_privacy\local\request\core_userlist_provider {
-
-    // =========================================================================
+    
     // METADATA — Dichiara i dati trattati
-    // =========================================================================
+    
 
     /**
      * Restituisce la lista dei dati personali trattati dal plugin.
@@ -84,7 +98,7 @@ class provider implements
             'ai_provider',
             [
                 'message'     => 'privacy:metadata:ai_provider:message',
-                'systemprompt'=> 'privacy:metadata:ai_provider:systemprompt',
+                'systemprompt' => 'privacy:metadata:ai_provider:systemprompt',
             ],
             'privacy:metadata:ai_provider'
         );
@@ -92,9 +106,9 @@ class provider implements
         return $collection;
     }
 
-    // =========================================================================
+    
     // CONTEXTLIST — Trova i contesti con dati dell'utente
-    // =========================================================================
+    
 
     /**
      * Restituisce i contesti che contengono dati dell'utente.
@@ -123,9 +137,9 @@ class provider implements
         return $contextlist;
     }
 
-    // =========================================================================
+    
     // USERLIST — Lista utenti con dati in un contesto
-    // =========================================================================
+    
 
     /**
      * Aggiunge gli utenti che hanno dati nel contesto dato.
@@ -143,9 +157,9 @@ class provider implements
         $userlist->add_from_sql('userid', $sql, []);
     }
 
-    // =========================================================================
+    
     // EXPORT — Esporta i dati dell'utente
-    // =========================================================================
+    
 
     /**
      * Esporta tutti i dati personali dell'utente.
@@ -217,9 +231,9 @@ class provider implements
         }
     }
 
-    // =========================================================================
+    
     // DELETE — Cancella i dati dell'utente
-    // =========================================================================
+    
 
     /**
      * Cancella tutti i dati in un contesto.
@@ -305,9 +319,9 @@ class provider implements
         }
     }
 
-    // =========================================================================
+    
     // HELPER PRIVATI
-    // =========================================================================
+    
 
     /**
      * Cancella tutti i dati AI di un utente specifico.

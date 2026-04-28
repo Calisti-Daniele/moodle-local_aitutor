@@ -5,6 +5,14 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -12,6 +20,7 @@ defined('MOODLE_INTERNAL') || die();
  * Restituisce la lista delle modalità disponibili.
  *
  * @return string[]
+ * @package local_aitutor
  */
 function local_aitutor_get_modes(): array {
     return ['free', 'socratic', 'explainer', 'quizprep', 'feedback'];
@@ -23,6 +32,7 @@ function local_aitutor_get_modes(): array {
  *
  * @param int $userid  ID utente
  * @return stdClass    Record della sessione
+ * @package local_aitutor
  */
 function local_aitutor_get_or_create_session(int $userid): stdClass {
     global $DB;
@@ -55,6 +65,7 @@ function local_aitutor_get_or_create_session(int $userid): stdClass {
  * @param int $sessionid
  * @param int $limit  Numero massimo di messaggi
  * @return array  [['role' => 'user', 'content' => '...'], ...]
+ * @package local_aitutor
  */
 function local_aitutor_get_message_history(int $sessionid, int $limit = 20): array {
     global $DB;
@@ -82,6 +93,7 @@ function local_aitutor_get_message_history(int $sessionid, int $limit = 20): arr
  * @param string $content
  * @param int    $tokens
  * @return int  ID del messaggio salvato
+ * @package local_aitutor
  */
 function local_aitutor_save_message(
     int $sessionid,
@@ -114,6 +126,7 @@ function local_aitutor_save_message(
 /**
  * Hook chiamato dopo l'installazione o aggiornamento del plugin.
  * Registra automaticamente i servizi web.
+ * @package local_aitutor
  */
 function local_aitutor_after_install(): void {
     global $CFG;
@@ -123,6 +136,7 @@ function local_aitutor_after_install(): void {
 
 /**
  * Hook chiamato dopo ogni upgrade del plugin.
+ * @package local_aitutor
  */
 function local_aitutor_after_upgrade(): void {
     global $CFG;

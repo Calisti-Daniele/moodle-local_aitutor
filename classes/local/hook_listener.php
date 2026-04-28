@@ -5,6 +5,14 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace local_aitutor\local;
 
@@ -16,9 +24,9 @@ require_once($CFG->dirroot . '/local/aitutor/lib.php');
  *
  * Viene chiamato automaticamente da Moodle su ogni pagina.
  * Decide se iniettare il widget e lo renderizza.
+ * @package local_aitutor
  */
 class hook_listener {
-
     /**
      * Inietta il widget AI floating in ogni pagina.
      * Chiamato dal hook before_footer_html_generation.
@@ -40,7 +48,6 @@ class hook_listener {
         if (!get_config('local_aitutor', 'enabled')) {
             return;
         }
-
 
         // 3. Utente non ha la capability
         $context = \context_system::instance();
@@ -76,10 +83,10 @@ class hook_listener {
 
         // Suggerimenti domande iniziali
         $suggestions = [
-            get_string('suggestion_courses',      'local_aitutor'),
-            get_string('suggestion_progress',     'local_aitutor'),
-            get_string('suggestion_deadlines',    'local_aitutor'),
-            get_string('suggestion_grades',       'local_aitutor'),
+            get_string('suggestion_courses', 'local_aitutor'),
+            get_string('suggestion_progress', 'local_aitutor'),
+            get_string('suggestion_deadlines', 'local_aitutor'),
+            get_string('suggestion_grades', 'local_aitutor'),
             get_string('suggestion_certificates', 'local_aitutor'),
         ];
 
@@ -96,8 +103,11 @@ class hook_listener {
 
             // Messaggio di benvenuto
             'welcome_message' => empty($messages)
-                ? get_string('widget_welcome', 'local_aitutor',
-                    (object)['firstname' => $USER->firstname])
+                ? get_string(
+                    'widget_welcome',
+                    'local_aitutor',
+                    (object)['firstname' => $USER->firstname]
+                )
                 : null,
 
             // Suggerimenti
@@ -106,16 +116,16 @@ class hook_listener {
                 : [],
 
             // Stringhe UI
-            'str_title'       => get_string('widget_title',       'local_aitutor'),
+            'str_title'       => get_string('widget_title', 'local_aitutor'),
             'str_placeholder' => get_string('widget_placeholder', 'local_aitutor'),
-            'str_send'        => get_string('widget_send',        'local_aitutor'),
-            'str_thinking'    => get_string('widget_thinking',    'local_aitutor'),
-            'str_clear'       => get_string('widget_clear',       'local_aitutor'),
+            'str_send'        => get_string('widget_send', 'local_aitutor'),
+            'str_thinking'    => get_string('widget_thinking', 'local_aitutor'),
+            'str_clear'       => get_string('widget_clear', 'local_aitutor'),
             'str_clear_confirm' => get_string('widget_clear_confirm', 'local_aitutor'),
-            'str_fullscreen'  => get_string('widget_fullscreen',  'local_aitutor'),
-            'str_open'        => get_string('widget_open',        'local_aitutor'),
-            'str_close'       => get_string('widget_close',       'local_aitutor'),
-            'str_error'       => get_string('widget_error',       'local_aitutor'),
+            'str_fullscreen'  => get_string('widget_fullscreen', 'local_aitutor'),
+            'str_open'        => get_string('widget_open', 'local_aitutor'),
+            'str_close'       => get_string('widget_close', 'local_aitutor'),
+            'str_error'       => get_string('widget_error', 'local_aitutor'),
         ];
 
         // Renderizza il template
