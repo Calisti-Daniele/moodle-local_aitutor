@@ -38,7 +38,6 @@ class ollama_provider implements provider_interface {
         $configurl = get_config('local_aitutor', 'ollama_url');
 
         // Debug temporaneo
-        error_log('AITUTOR ollama_url from config: [' . $configurl . ']');
 
         $this->baseurl        = rtrim($configurl ?: 'http://ollama:11434', '/');
         $this->model          = get_config('local_aitutor', 'ollama_model')       ?: 'llama3.2';
